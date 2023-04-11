@@ -1,5 +1,5 @@
 # Project Name
-- Name (@username)
-- Name (@username)
-- Name (@username)
-- Name (@username)
+- Marlon Burog (4-gent) (Team Lead)
+- Anthony Luu (EdotAnt)
+- Minh Phong Do (stanphong)
+- Hana Suzuki (Hana1107)
