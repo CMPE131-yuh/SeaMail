@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Your Mailroom</title>
+    </head>
+    <body>
+        <h1>Email List</h1>
+        {% for i in emails %}
+            <ul>
+                <li>{{i.emails}}</li>
+            </ul>
+        {% endfor %}
+    </body>
+</html>
