@@ -1,7 +1,7 @@
 ## Meetings
 
 
-### 2023-04-14 at 5:30
+### 2023-04-14 at 5:30 - 6:00
 - Marlon, Hana, Anthony, Minh
 - Team updates
   - We started the project
