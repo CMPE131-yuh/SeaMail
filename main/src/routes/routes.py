@@ -21,6 +21,10 @@ router = APIRouter()
 def index():
     return render_template('index.html')
 
+@myapp_obj.route("/logout")
+def logout():
+    return render_template('logout.html')
+
 #create request, make an email
 @router.post("/", response_description="Create a new email", status_code=status.HTTP_201_CREATED, response_model=Email)
 def create_email(request: Request, email: Email = Body(...)):
