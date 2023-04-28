@@ -31,3 +31,11 @@ def listEmails():
         return render_template('mailroom.html', emails=maillist)
     else:
         return render_template('mailroom.html', message='Email List not listed')
+
+@myapp_obj.route('/logout')
+def logout():
+    return render_template('logout.html')
+
+@myapp_obj.route('/login')
+def login():
+    return render_template('log_in.html')
