@@ -4,9 +4,7 @@ from src import myapp_obj
 #import flask libraries
 from flask import render_template, request
 
-from run import mongo, emails
-
-mailing = mongo.db.emails
+from run import emails, todos
 
 #render index route
 @myapp_obj.route("/", methods=['GET', 'POST'])
@@ -16,9 +14,9 @@ def index():
 
 #add emails to database
 @myapp_obj.route('/sendMail', methods=['GET', 'POST'])
-def addEmail():
+def sendEmail():
     if request.method == 'POST':
-        mailing.insert_one({'sender': 'test sender', 'subject': 'test subject', 'message': 'test message'})
+        emails.insert_one({'sender': 'test sender', 'subject': 'test subject', 'message': 'test message'})
         return render_template('mailroom.html', message='message sent')
     else:
         return render_template('mailroom.html', message='message not sent')
@@ -26,11 +24,32 @@ def addEmail():
 #list emails from database
 @myapp_obj.route('/mailroom', methods=['GET', 'POST'])
 def listEmails():
+    maillist = emails.find()
+    return render_template('mailroom.html', emails=maillist)
+
+#render todolist
+@myapp_obj.route('/todolist', methods=['GET', 'POST'])
+def todo():
+    return render_template('todo.html')
+
+#add item to todo list database
+@myapp_obj.route('/addtodo', methods=['GET', 'POST'])
+def addTodo():
     if request.method == 'POST':
-        maillist = mailing.find()
-        return render_template('mailroom.html', emails=maillist)
-    else:
-        return render_template('mailroom.html', message='Email List not listed')
+        todoitem = request.form['todoitem']
+        todos.insert_one({'item': todoitem})
+        getTodoItem = todos.find()
+        return render_template('todo.html', todos=getTodoItem)
+    return render_template('todo.html', todos='Todo Not Rendered')
+
+#remove item from todo list database collection
+@myapp_obj.route('/removetodo', methods=['GET', 'POST'])
+def remTodo():
+    if request.method == 'POST':
+        todos.delete_one({})
+        getTodoItem = todos.find()
+        return render_template('todo.html', todos=getTodoItem)
+    return render_template('todo.html', todos='Todo Not Rendered')
 
 @myapp_obj.route('/logout')
 def logout():
