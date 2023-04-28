@@ -13,6 +13,7 @@ mongo = MongoClient(MONGO_URI)
 db = mongo.get_database('SeaMail')
 emails = pymongo.collection.Collection(db, 'emails')
 todos = pymongo.collection.Collection(db, 'todolist')
+users = pymongo.collection.Collection(db, 'users')
 
 if __name__ == '__main__':
     myapp_obj.run(debug = True)

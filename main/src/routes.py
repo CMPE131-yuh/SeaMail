@@ -4,7 +4,7 @@ from src import myapp_obj
 #import flask libraries
 from flask import render_template, request
 
-from run import emails, todos
+from run import emails, todos, users
 
 #render index route
 @myapp_obj.route("/", methods=['GET', 'POST'])
@@ -58,3 +58,7 @@ def logout():
 @myapp_obj.route('/login')
 def login():
     return render_template('log_in.html')
+
+@myapp_obj.route('/register')
+def register():
+    return render_template('register.html')
