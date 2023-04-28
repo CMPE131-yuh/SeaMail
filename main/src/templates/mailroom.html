@@ -5,9 +5,14 @@
     </head>
     <body>
         <h1>Email List</h1>
+        <form method="POST" action="{{url_for('sendEmail')}}">
+            <input type="submit" value="Send Email">
+        </form>
         {% for i in emails %}
             <ul>
-                <li>{{i.emails}}</li>
+                <li>{{i.sender}}</li>
+                <li>{{i.subject}}</li>
+                <li>{{i.message}}</li>
             </ul>
         {% endfor %}
         <p>{{message}}</p>
