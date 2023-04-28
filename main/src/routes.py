@@ -50,3 +50,11 @@ def remTodo():
         getTodoItem = todos.find()
         return render_template('todo.html', todos=getTodoItem)
     return render_template('todo.html', todos='Todo Not Rendered')
+
+@myapp_obj.route('/logout')
+def logout():
+    return render_template('logout.html')
+
+@myapp_obj.route('/login')
+def login():
+    return render_template('log_in.html')
