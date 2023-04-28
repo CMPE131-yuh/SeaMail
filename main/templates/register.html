@@ -1,0 +1,16 @@
+<h1>Register</h1>
+<form action ="" method ="POST" nonvalidate>
+	{{form.hiddentag()}}
+	<p> Registration Page </p>
+	<p> Please  fill in the form to register account </p>
+	<p> {{form.firstname.label}} <br>
+	    {{form.firstname(size = 35)}} </p>
+	<p> {{form.lastname.label}} <br>
+	    {{form.lastname(size = 35)}} </p>
+	<p> {{form.username.label}} <br>
+	    {{form.username(size = 35)}} </p>
+	<p> {{form.password.label}} <br>
+	    {{form.password(size = 35)}} </p>
+	<p> {{form.submit()}} </p>
+</form>
+	 
