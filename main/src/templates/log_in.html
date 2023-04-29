@@ -61,14 +61,14 @@
     <div class="bubble"></div>
     <div class="bubble"></div>
     <div class="bubble"></div>
-    <form class="Log-in-box">
+    <form class="Log-in-box" action="{{ url_for('login') }}" method="POST">
         <h3>Sign in</h3>
     
         <label for="username">Username</label>
-        <input type="text" placeholder="Email or Phone" id="username">
+        <input id="username" name="username" type="text" placeholder="Enter Your Username" required>
     
         <label for="password">Password</label>
-        <input type="password" placeholder="Password" id="password">
+        <input id="password" name="password" type="password" placeholder="Enter Your Password" required>
     
         <button>Log In</button>
     </form>

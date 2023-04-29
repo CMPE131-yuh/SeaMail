@@ -5,7 +5,7 @@
     </head>
 
     <body>
-        <h1>{{curren_user}}'s Account Page</h1>
+        <h1>{{current_user}}'s Account Page</h1>
         <p>Hello, {{current_user}}</p>
         <!--replace image with user's profile pic-->
         <!--<img src = "Blank-profile.png" alt="userpic" width="500" height="500"> </img>-->
@@ -16,14 +16,13 @@
         <p>You have # emails in your inbox!</p>   
     </br></br>
     <div align = "left">
-        <a href="afterLogout">
-            <button type = "button" onclick = "alert('Are you sure?')">Log Out</button>
-        </a>
-    </div>
-    <div align = "right">
-        <button type = "button" onclick = "alert('Are you sure you want to delete your account?')">Delete Account</button>
-    </div>
-        
+        <form action="{{ url_for('logout') }}" method="POST">
+            <button type = "submit" name = "logout_button" onclick = "alert('Are you sure?')">Log Out</button>
+
+            <button type = "submit" name = "delete_button" onclick = "alert('Are you sure you want to delete your account?')">Delete Account</button>
+            
         </form>
+        
+    </div>
     </body>
 </html>
