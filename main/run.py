@@ -7,12 +7,15 @@ from src import myapp_obj
 
 config = dotenv_values(".env")
 
-MONGO_URI = 'mongodb+srv://seamail:seamailpassword@cluster0.lct6aap.mongodb.net/?retryWrites=true&w=majority'
+MONGO_URI = 'mongodb+srv://hanasuzuki:8gZpPyV7ZkTb7XOi@test.6mtzohb.mongodb.net/test'
+
 
 mongo = MongoClient(MONGO_URI)
 db = mongo.get_database('SeaMail')
 emails = pymongo.collection.Collection(db, 'emails')
 todos = pymongo.collection.Collection(db, 'todolist')
+users = pymongo.collection.Collection(db, 'users')
+
 
 if __name__ == '__main__':
     myapp_obj.run(debug = True)
