@@ -4,7 +4,12 @@
         <title>Your Mailroom</title>
     </head>
     <body>
-        <h1>Email List</h1>
+        <h1>Email List for {{current_user}}</h1>
+        <div align = "right">
+            <a href = 'logout'>
+                <button type="button">Account</button>
+            </a>
+        </div>
         <form method="POST" action="{{url_for('sendEmail')}}">
             <input type="submit" value="Send Email">
         </form>
