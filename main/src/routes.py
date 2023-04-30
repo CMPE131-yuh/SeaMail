@@ -19,15 +19,15 @@ def index():
 def sendEmail():
     if request.method == 'POST':
         emails.insert_one({'sender': 'test sender', 'subject': 'test subject', 'message': 'test message'})
-        return render_template('mailroom.html', message='message sent')
+        return render_template('mailroom.html', message='message sent', current_user = session['user'])
     else:
-        return render_template('mailroom.html', message='message not sent')
+        return render_template('mailroom.html', message='message not sent', current_user = session['user'])
 
 #list emails from database
 @myapp_obj.route('/mailroom', methods=['GET', 'POST'])
 def listEmails():
     maillist = emails.find()
-    return render_template('mailroom.html', emails=maillist)
+    return render_template('mailroom.html', emails=maillist, current_user = session['user'])
 
 #render todolist
 @myapp_obj.route('/todolist', methods=['GET', 'POST'])
