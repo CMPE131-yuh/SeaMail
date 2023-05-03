@@ -2,15 +2,15 @@
 
 1. User Registration
 2. User Login
-3. Develop a login database for user login handling with standard CRUD operations
+3. Undo messaging and unsend emails
 4. Chat/Messaging functionality
 5. Todo List (Using external API)
-6. Create a mailing database to hold emails that will be posted to user mailroom after login
+6. Users can change their password and username upon providing the correct informations
 7. Mailer/Mail Generation
 8. Customization of Website
 9. User Logout
 10. Notification functionality
-11. Users able to attach images to their email as well as send them in chat
+11. Users are able to attach images to their email as well as send them in chat
 12. Users send message request to a designated recipient
 
 ## Non-functional Requirements
@@ -70,35 +70,32 @@
   1. System displays error message
   2. System stays on the login page
 
-3. Develop a login database for user login handling with standard CRUD operations
+3. Users can change their password and username upon providing the correct informations
 
 - **Pre-condition:**
 
   1. User has to be a registered user
-  2. Must have a working username and password
-  3. Python flask atlas external api to handle database collections
+  2. User needs to be logged in
 
 - **Trigger:**
 
-  1. Text area for form input
-  2. Login Button
+  1. Change password button
 
 - **Primary Sequence:**
 
-  1. Client inputs credentials into username and password input fields
-  2. Client hits login to send credentials through backend to fetch data through mongodb to make sure the credentials match
-  3. Redirects to users mailroom
+  1. User navigate oneself over to the account page
+  2. Click on 'change password' button to request password change
+  3. Redirects to a new page where asks user to enter their username, current password, and new password
+  4. Click on 'change password' button to finish 
 
 - **Primary Postconditions:**
 
-  1. Credentials get sent to api call
-  2. Redirects user to mailroom
-  3. User’s emails are posted from collection in mongodb
+  1. Users have successfully changed their password
 
-- **Alternate Sequence:** Wrong user credentials
+- **Alternate Sequence:** Wrong username or password
 
-  1. Returns pop-up that credentials are incorrect
-  2. User will have to re input correct credentials
+  1. Returns an alert or message 
+  2. Returns to the password change page to reenter their credentials for another attempt
 
 4. Chat/Messaging functionality
 
@@ -114,9 +111,8 @@
 
   1. Sender inputs recipient address/username/email
   2. Sender drafts message in text areas
-  3. Sender performs trigger
-  4. Message post request to messaging database
-  5. From database, recipient performs get request, gets message from database
+  3. Sender clicks on the send button
+  4. Sender receives sent receipt
 
 - **Primary Postconditions:**
 
@@ -144,8 +140,7 @@
   1. Sender inputs recipient address/username/email
   2. Sender drafts message in text areas
   3. Sender performs trigger
-  4. Message post request to messaging database
-  5. From database, recipient performs get request, gets message from database
+  4. Sender receives a sent receipt
 
 - **Primary Postconditions:**
 
