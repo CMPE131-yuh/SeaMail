@@ -3,13 +3,13 @@
 1. User Registration
 2. User Login
 3. Undo messaging and unsend emails
-4. Chat/Messaging functionality
+4. Composing realtime message to chat with another user
 5. Todo List (Using external API)
 6. Users can change their password and username upon providing the correct informations
-7. Mailer/Mail Generation
-8. Customization of Website
+7. Composing message to send email to another user
+8. User creates block list to stop someone sending email or chat to them
 9. User Logout
-10. Notification functionality
+10. Notification for new messages, emails.
 11. Users are able to attach images to their email as well as send them in chat
 12. Users send message request to a designated recipient
 
