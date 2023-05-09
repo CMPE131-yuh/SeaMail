@@ -3,10 +3,11 @@ from src import myapp_obj
 
 #import flask libraries
 from flask import render_template, request, redirect, url_for, session
-
-from run import emails, todos, users
+from run import emails, todos, users, socketio
+from flask_socketio import join_room, leave_room, send
 
 myapp_obj.secret_key = "SEAMAIL.HQ"
+
 
 #render index route
 @myapp_obj.route("/", methods=['GET', 'POST'])
@@ -56,7 +57,6 @@ def remTodo():
 @myapp_obj.route('/logout', methods = ['GET', 'POST'])
 def logout():
     delete_user = session['user']
-    print(delete_user)
     if request.method == 'POST':
         if 'logout_button' in request.form:
             session.pop('user')
@@ -65,6 +65,8 @@ def logout():
             users.delete_one({'username':delete_user})
             session.pop('user')
             return redirect(url_for('login'))
+        elif 'change_password' in request.form:
+            return redirect(url_for('changePassword'))
     return render_template('logout.html', current_user = session['user'])
 
 @myapp_obj.route('/login', methods = ['GET', 'POST'])
@@ -74,7 +76,7 @@ def login():
         psw = request.form['password']
         if users.find_one({'username':name, 'password':psw}) != None:
             session['user'] = name
-            return redirect(url_for('sendEmail'))
+            return redirect(url_for('listEmails'))
         else:
             return """
             <div align = "center">
@@ -107,3 +109,22 @@ def register():
 @myapp_obj.route('/afterLogout')
 def afterLogout():
     return render_template('logged_out.html')
+
+@myapp_obj.route('/change_password', methods = ['GET', 'POST'])
+def changePassword():
+    return render_template('password_change.html')
+
+@myapp_obj.route('/chatroom', methods = ['get', 'post'])
+def chatroom():
+    return render_template('chatroom.html')
+
+@myapp_obj.route('/room')
+def room():
+    return render_template('room.html')
+
+@socketio.on("connect")
+def connect(auth):
+    room = session.get("room")
+    name = session.get("name")
+    if not room or not name:
+        return
