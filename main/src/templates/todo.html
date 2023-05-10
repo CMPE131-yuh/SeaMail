@@ -4,7 +4,7 @@
         <title>You're ToDo List</title>
     </head>
     <body>
-        <h1>ToDo List</h1>
+        <h1>ToDo List for {{username}}</h1>
         <form method="POST" action="{{url_for('addTodo')}}">
             <label for="todoitem">Todo Item:</label>
             <input type="text" id="item" name="todoitem">
@@ -14,7 +14,7 @@
         <ul>
             <li>
                 {{i.item}}
-                <form method="POST" action="{{url_for('remTodo')}}">
+                <form method="POST" action="{{url_for('remTodo', oid=i._id)}}">
                     <button type="submit">Remove Todo</button>
                 </form>
             </li>

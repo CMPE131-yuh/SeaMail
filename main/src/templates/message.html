@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Message in a Bottle</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.0/socket.io.js" integrity="sha512-+l9L4lMTFNy3dEglQpprf7jQBhQsQ3/WvOnjaN/+/L4i0jOstgScV0q2TjfvRF4V+ZePMDuZYIQtg5T4MKr+MQ==" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                var socket = io.connect("http://10.250.68.86:5000")
+                socket.on('connect', function(){
+                    socket.send("User Connected!")
+                })
+                socket.on('message', function(data){
+                    $('#fuck').append($('<li>' + data + '</li>').text(data).html())
+                })
+                $('#sendBtn').on('click', function(){
+                    socket.send($('#message').val())
+                    $('#message').val('')
+                })
+            })
+        </script>
+        <div id="fuck"></div>
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="text" id="message" placeholder="Message" required>
+        <button id="sendBtn">Send</button>
+    </body>
+</html>
