@@ -1,3 +1,17 @@
+{% extends "base.html" %} {% block title %}TodoList{% endblock %}
+{% block navbar%}
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: rgba(247, 247, 247, 0.15); backdrop-filter: >    <div class="container-fluid justify-content-center">
+        <div class="navbar-header">
+            <a class="navbar-brand text-warning bold h4" href="#">SeaMail</a>
+        </div>
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item"><a class="nav-link text-warning h4" href="/chat">Chat</a></li>
+            <li class="nav-item"><a class="nav-link text-warning h4" href="/todolist">TodoList</a></li>
+        </ul>
+        <a class="nav-link btn btn-outline-dark" href="logout">Account</a>
+    </div>
+</nav>
+{% endblock%}
 <!DOCTYPE html>
 <html>
     <head>
@@ -22,3 +36,6 @@
         {% endfor %}
     </body>
 </html>
+ {% endblock %}
+
+</nav>
