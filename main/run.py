@@ -17,6 +17,8 @@ db = mongo.get_database('SeaMail')
 emails = pymongo.collection.Collection(db, 'emails')
 todos = pymongo.collection.Collection(db, 'todolist')
 users = pymongo.collection.Collection(db, 'users')
+chat_history = pymongo.collection.Collection(db, 'chat')
+roomz = pymongo.collection.Collection(db, 'roomz')
 blocked = pymongo.collection.Collection(db, 'blocked')
 
 if __name__ == '__main__':

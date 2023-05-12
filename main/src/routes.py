@@ -10,8 +10,10 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 import io
+import random
+from string import ascii_uppercase
 
-from run import emails, todos, users, socketio
+from run import emails, todos, users, chat_history, roomz
 
 myapp_obj.secret_key = "SEAMAIL.HQ"
 
@@ -36,8 +38,14 @@ def sendEmail():
         rec = request.form['recipe']
         if request.files:
             emailImage = request.files['image']
-            emails.save_file(emailImage.filename, emailImage)
-            emails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False, 'img': emailImage, 'hasImg': True})
+            im = Image.open(emailImage)
+            image_bytes = io.BytesIO()
+            im.save(image_bytes)
+            image = {
+                'data': image_bytes.getvalue()
+            }
+            #emails.save_file(emailImage.filename, emailImage)
+            emails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False, 'img': image, 'hasImg': True})
         else:
             emails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False, 'hasImg': False})
         return redirect(url_for('listEmails'))
@@ -48,9 +56,13 @@ def sendEmail():
 @myapp_obj.route('/openImage/<oid>', methods=['GET', 'POST'])
 def openImage(oid):
     if request.method == 'POST':
+        
         #if emails.find({'_id': ObjectId(oid), 'hasImg': True}).count() > 0:
         image = emails.find({'_id': ObjectId(oid)})
-        return render_template('viewImage.html', view=image)
+        pil_img = Image.open(io.BytesIO(image['data']))
+        plt.imshow(pil_img)
+        plt.show()
+        #return render_template('viewImage.html', view=image)
         #else:
         #return render_template('viewImage.html', view='No Image Attached')
 
@@ -171,17 +183,85 @@ def register():
 def afterLogout():
     return render_template('logged_out.html')
 
-#---------------------------------------------------------
-#socket message rouonte
-@socketio.on('message')
-def handle_message(message):
-    #emit('message', json_data, broadcast=True, include_self=False)
-    print("Received Message: " + message)
-    if message != "User Connected!":
-        send(message, broadcast=True)
+@myapp_obj.route('/change_password', methods = ['GET', 'POST'])
+def changePassword():
+    if request.method == 'POST':
+        check_username = users.find_one({'username' : request.form['username'], 'password' : request.form['current_password']})
+        check_email = users.find_one({'email' : request.form['username'], 'password' : request.form['current_password']})
+        new = request.form['new_password']
 
-#render messagenger route
-@myapp_obj.route('/message-room', methods=['GET', 'POST'])
-def messageRoom():
-    return render_template('message.html')
-#---------------------------------------------------------
+        if check_email == None and check_username == None:
+            return """
+            <div align='center'>
+                <h3>Wrong combination of username/email and password</h3>
+                <h3>Please try again!</h3>
+                </br>
+                <a href = "change_password">Return to the previous page</a>
+            </div>
+            """
+        elif request.form['current_password'] != request.form['check_current']:
+            return """
+            <h3>The passwords don't match!</h3>
+            </br>
+            <a href = "change_password">Return to the previous page</a>
+            """
+        else:
+            query = {'username' : request.form['username']}
+            update = { "$set": { "password": new } }
+            users.update_one(query, update)
+            return redirect(url_for('logout'))
+
+    return render_template('password_change.html')
+
+@myapp_obj.route('/enterance', methods = ['GET', 'POST'])
+def enterance():
+    if request.method == 'POST':
+        recipient = request.form['recipient']
+        list = chat_history.find({'$or': [{'$and' : [{'recipient' : recipient, 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : recipient}]}]})
+        num = chat_history.find({'$or': [{'$and' : [{'recipient' : recipient, 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : recipient}]}]}).count()
+
+        if num == None:
+            request.insert_one({True: session['user'], False : recipient})
+            return """
+            <div align='center'>
+                <h3>Chat request has been sent successfully to {{recipient}}</h3>
+                <h3>Please wait for them to accept the request!</h3>
+                </br>
+                <a href = "enterance">Return to the previous page</a>
+            </div>
+            """
+        else:
+            session['num'] = num
+            session['recipient'] = recipient
+            return redirect(url_for('room', chats = list))
+
+    return render_template('enterance.html')
+
+@myapp_obj.route('/room', methods = ['GET', 'POST'])
+def room():
+    list = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]})
+
+    if request.method == 'GET':
+        return render_template('room.html', chats = list)
+    num_message = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]}).count()
+    if session['num'] != num_message:
+        session['num'] = num_message
+        return render_template('room.html', chats = list)
+
+    if request.method == 'POST':
+        if 'exit' in request.form:
+            session.pop('recipient')
+            session.pop('num')
+            return redirect(url_for('enterance'))
+
+        new_msg = request.form['message']
+        chat_history.insert_one({'sender' : session['user'], 'recipient' : session['recipient'], 'message' : new_msg})
+        list = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},
+        {'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]})
+        session['num'] = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},
+        {'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]}).count()
+        return render_template('room.html', chats = list)
+    
+    
+
+    return render_template('room.html', chats = list)

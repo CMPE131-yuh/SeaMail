@@ -17,10 +17,11 @@
     </br></br>
     <div align = "left">
         <form action="{{ url_for('logout') }}" method="POST">
-            <button type = "submit" name = "logout_button" onclick = "alert('Are you sure?')">Log Out</button>
-
-            <button type = "submit" name = "delete_button" onclick = "alert('Are you sure you want to delete your account?')">Delete Account</button>
-            
+            <button id="logout" type = "submit" name = "logout_button" onclick = "alert('Are you sure?')">Log Out</button>
+            </br></br>
+            <button id="delete" type = "submit" name = "delete_button" onclick = "alert('Are you sure you want to delete your account?')">Delete Account</button>
+            </br></br>
+            <button id="change" type = "submit" name = "change_password">Change Password</button>
         </form>
         
     </div>
