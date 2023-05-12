@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang = "en">
+    <head>
+        <title>After LogOut Page</title>
+    </head>
+    <body>
+        {% for i in requests %}
+      <li>{{i.True}} is requesting to start a chat with you: </li>
+      <form method="POST" action="{{url_for('requestlists', oid=i._id)}}">
+        <button type="submit" name="accept">
+          accept
+        </button>
+        <button type="submit" name="decline">
+            decline
+        </button>
+      </form>
+    {% endfor %}
+    </body>>
+</html>

@@ -19,9 +19,10 @@ emails = pymongo.collection.Collection(db, 'emails')
 todos = pymongo.collection.Collection(db, 'todolist')
 users = pymongo.collection.Collection(db, 'users')
 chat_history = pymongo.collection.Collection(db, 'chat')
-request = pymongo.collection.Collection(db, 'requests')
+roomz = pymongo.collection.Collection(db, 'roomz')
 blocked = pymongo.collection.Collection(db, 'blocked')
 blockedEmails = pymongo.collection.Collection(db, 'blockedEmails')
+image = pymongo.collection.Collection(db, 'images')
 
 grid_fs = gridfs.GridFS(db)
 

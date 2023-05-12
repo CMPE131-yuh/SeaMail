@@ -28,13 +28,12 @@
 </nav>
 {% endblock %}
 {% block content %}
-    <div class="chatting text-center">
-        <h2>Enter the Chat Room</h2>
+    <div class="chatting text-center" style="display: block; height: 50px; width: auto; margin: auto;">
+        <h2 class="text-warning">Enter the Chat Room</h2>
         <form action="{{ url_for('enterance') }}" method="POST">
-            <div>
-                <label>Recipient: </label>
-                <input placeholder="Enter recipient's username or email" name="recipient">
-                <button type="submit" name="create_room">Create a room or request chat</button>
+            <div class="form-outline">
+                <input type="text" class="form-control" placeholder="Enter recipient's username or email" name="recipient">
+                <button class="btn btn-secondary" type="submit" name="create_room">Start a New Message Thread</button>
             </div>
         </form>
     </div>

@@ -35,23 +35,35 @@
     <meta http-equiv="refresh" content="10">
   </head>
   <body>
+    <div class="panel panel-default m-t-20 bg-white rounded overflow-hidden">
+      <div class="panel-body">
+        <table class="table table-striped">
+          <tbody>
 
-
+    {% for i in chats %}
+      <tr>
+        <td>
+          <i class="fa fa-circle text-info m-r-15"></i>
+          {{i.sender}}
+        </td>
+        <td>
+          <a href="#" data-toggle="modal" data-target="#{{i}}" style="color:black; text-decoration: none;">{{i.message}}</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+</div>
     <div class="inputs">
       <form action="{{ url_for('room') }}" method="POST">
-        <input type="text" name="message">
-        <button id="change" type = "submit" name = "send-btn">Send</button>
-        <div align="right">
-          <form method="POST">
-            <button type="submit" name="exit">Exit the chat</button>
+        <input type="text" name="message" placeholder="Message">
+        <button class="btn btn-secondary" id="change" type = "submit" name = "send-btn">Send</button>
+          <form method="POST" style="display: block; margin-right: auto;">
+            <button class="btn btn-secondary" type="submit" name="exit">Exit the chat</button>
           </form>
-        </div>
       </form>
-    
     </div>
-    {% for i in chats %}
-      <li>{{i.sender}}: {{i.message}}</li>
-    {% endfor %}
   </body>
 </html>
 {% endblock %}

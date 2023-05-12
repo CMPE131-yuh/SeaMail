@@ -1,8 +1,8 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %} {% block link%}
 rel="stylesheet" href="{{ url_for('static', filename='public/index.css') }}" {%
 endblock %} {% block content%}
-<div class="text-center">
-  <h1>SeaMail</h1>
+<div class="text-center" style="justify-content: center; margin-top: 250px;">
+  <h1 class="text-warning" style="font-size: 125px;">SeaMail</h1>
   <a class="btn btn-primary" href="/login">Login</a>
   <a class="btn btn-primary" href="/register">Register</a>
 </div>
