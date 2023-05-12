@@ -1,11 +1,13 @@
-<!DOCTYPE html>
-<html lang = "en">
-    <head>
-        <title>After LogOut Page</title>
-    </head>
-    <div>
-        <h2>You have successfully logged out!</h2>
-    </br></br></br></br></br>
-        <a href = 'login'>Sign in again?</a>
-    </div>
-</html>
+{% extends "base.html" %} {% block title %}After LogOut Page{% endblock %} {%
+block link%} rel="stylesheet" href="{{ url_for('static',
+filename='public/index.css') }}" {% endblock %} {% block content %}
+<div
+  class="d-flex justify-content-center align-items-center"
+  style="height: 100vh"
+>
+  <div class="text-center">
+    <h1>You have successfully logged out!</h1>
+    <a href="login" class="text-warning h3">Sign in again?</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,53 +1,67 @@
-{% extends "base.html" %} {% block title %}Seamail Logout Page{% endblock %} {% block
-    link%} rel="stylesheet" href="{{ url_for('static',
-    filename='public/logout.css') }}" {% endblock %} {% block navbar%}
-    <nav
-    class="navbar navbar-expand-lg navbar-light"
-    style="
-      background-color: rgba(247, 247, 247, 0.15);
-      backdrop-filter: blur(5px);
-    "
-  >
-    <div class="container-fluid">
-      <div class="navbar-header">
-        <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
-      </div>
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item">
-          <a class="nav-link btn btn-outline-dark h4 m-2 px-4" href="/chat"
-            >Chat</a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link btn btn-outline-dark h4 m-2 px-4" href="/todolist"
-            >TodoList</a
-          >
-        </li>
-      </ul>
-      <a class="nav-link btn btn-outline-dark" href="logout">Account</a>
+{% extends "base.html" %} {% block title %}Seamail Logout Page{% endblock %}
+{% block navbar%}
+<nav
+  class="navbar navbar-expand-lg navbar-light"
+  style="
+    background-color: rgba(247, 247, 247, 0.15);
+    backdrop-filter: blur(5px);
+  "
+>
+  <div class="container-fluid justify-content-center">
+    <div class="navbar-header">
+      <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
     </div>
-  </nav>
-    {% endblock%}
-{% block content%}
-<div class="">
-
-</div>
-<h1>{{current_user}}'s Account Page</h1>
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a
+          class="nav-link btn btn-outline-dark h4 m-2 px-4 text-warning"
+          href="/chat"
+          >Chat</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link btn btn-outline-dark h4 m-2 px-4 text-warning"
+          href="/todolist"
+          >TodoList</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link btn btn-outline-dark h4 m-2 px-4 text-warning"
+          href="/outbox"
+          >Outbox</a
+        >
+      </li>
+    </ul>
+    <a class="nav-link btn btn-outline-dark" href="logout">Account</a>
+  </div>
+</nav>
+{% endblock%}
+{% block content %}
+<div class="h-100 d-flex align-items-center justify-content-center">
+    <div class="d-flex flex-column">
+        <div class="mx-5 text-warning"><h1>{{current_user}}'s Account Page</h1></div>
+    </div>
+    <div class="mx-5 p-4 text-white" style="border-radius:10px; background-color: rgba(247, 247, 247, 0.15);
+    backdrop-filter: blur(5px);">
         <p>Hello, {{current_user}}</p>
         <!--replace image with user's profile pic-->
         <!--<img src = "Blank-profile.png" alt="userpic" width="500" height="500"> </img>-->
-        <p>Show info about the user logged in</p>
-    </br></br>
-        <p>You have # tasks on your Todo list!</p>
-    </br></br>
-        <p>You have # emails in your inbox!</p>   
-    </br></br>
-    <div align = "left">
+        <p>This is your email: </p>
+    </br>
+        <p>You have <span class="text-warning">{{todos|length}}</span> tasks on your <a href="/todolist" class="text-light">Todo list!</a></p>
+    </br>
+        <p>You have <span class="text-warning">{{mails|length}}</span> emails in your <a href="/mailroom" class="text-light">inbox!</a></p> 
+    </br>
+    <div>
         <form action="{{ url_for('logout') }}" method="POST">
-            <button class="btn btn-outline-warning" type = "submit" name = "logout_button" onclick = "alert('Are you sure?')">Log Out</button>
+            <button class="btn btn-dark" type = "submit" name = "logout_button" onclick = "alert('Are you sure?')">Log Out</button>
 
-            <button class="btn btn-outline-warning" type = "submit" name = "delete_button" onclick = "alert('Are you sure you want to delete your account?')">Delete Account</button>
+            <button class="btn btn-dark" type = "submit" name = "delete_button" onclick = "alert('Are you sure you want to delete your account?')">Delete Account</button>
             
         </form>
     </div>
-{% endblock%}
+    </div>
+</div>
+{% endblock %}
