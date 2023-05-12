@@ -14,7 +14,7 @@ import io
 import random
 from string import ascii_uppercase
 
-from run import emails, todos, users, chat_history, roomz, grid_fs, blocked, blockedEmails
+from run import emails, todos, users, chat_history, request, grid_fs, blocked, blockedEmails
 
 myapp_obj.secret_key = "SEAMAIL.HQ"
 
@@ -121,7 +121,6 @@ def remTodo(oid):
 @myapp_obj.route('/logout', methods = ['GET', 'POST'])
 def logout():
     delete_user = session['user']
-    print(delete_user)
     if request.method == 'POST':
         if 'logout_button' in request.form:
             session.pop('user')
@@ -130,6 +129,11 @@ def logout():
             users.delete_one({'username':delete_user})
             session.pop('user')
             return redirect(url_for('login'))
+        elif 'change_password' in request.form:
+            return redirect(url_for('changePassword'))
+        elif 'request_lists' in request.form:
+            req = request.find_one({False : session['user']})
+            return redirect(url_for('requestlists'), requests = req)
     return render_template('logout.html', current_user = session['user'])
 
 #login into user account, redirect into user mailroom
@@ -210,10 +214,14 @@ def changePassword():
 def enterance():
     if request.method == 'POST':
         recipient = request.form['recipient']
+
+        if users.find_one({'username' : recipient}) == None:
+            flash('User does not exist! Please try again')
+
         list = chat_history.find({'$or': [{'$and' : [{'recipient' : recipient, 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : recipient}]}]})
         num = chat_history.find({'$or': [{'$and' : [{'recipient' : recipient, 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : recipient}]}]}).count()
 
-        if num == None:
+        if list == None:
             request.insert_one({True: session['user'], False : recipient})
             return """
             <div align='center'>
@@ -223,8 +231,9 @@ def enterance():
                 <a href = "enterance">Return to the previous page</a>
             </div>
             """
+        elif request.find_one({'True' : session['user'], 'False' : recipient}) != None:
+            flash('Please for the recipient to accept your request!')
         else:
-            session['num'] = num
             session['recipient'] = recipient
             return redirect(url_for('room', chats = list))
 
@@ -236,26 +245,17 @@ def room():
 
     if request.method == 'GET':
         return render_template('room.html', chats = list)
-    num_message = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]}).count()
-    if session['num'] != num_message:
-        session['num'] = num_message
-        return render_template('room.html', chats = list)
 
     if request.method == 'POST':
         if 'exit' in request.form:
             session.pop('recipient')
-            session.pop('num')
             return redirect(url_for('enterance'))
 
         new_msg = request.form['message']
         chat_history.insert_one({'sender' : session['user'], 'recipient' : session['recipient'], 'message' : new_msg})
         list = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},
         {'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]})
-        session['num'] = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},
-        {'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]}).count()
         return render_template('room.html', chats = list)
-    
-    
 
     return render_template('room.html', chats = list)
 
@@ -288,3 +288,14 @@ def unblock(oid):
                 emails.insert_one(blockedEmail)
         flash("User Unblocked")
         return redirect(url_for('listAccounts'))
+
+@myapp_obj.route('requestlist.html')
+def requestlists(oid):
+    req = request.find_one({False : session['user']})
+    if request.method == 'POST':
+        if 'accept' in request.form:
+            request.update_one({'_id' : ObjectId(oid)}, {'$set' : {True : session['user']}})
+        elif 'decline' in request.form:
+            request.delete_one({'_id' : ObjectId(oid)})
+    return render_template('requestlist.html', requests = req)
+
