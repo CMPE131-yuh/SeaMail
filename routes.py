@@ -179,14 +179,25 @@ def changePassword():
 @myapp_obj.route('/enterance', methods = ['GET', 'POST'])
 def enterance():
     if request.method == 'POST':
-        list = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]})
-        num = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]}).count()
-        if num == 0:
-            request.insert_one({'user1': session['user'], 'user2' : session})
-        session['recipient'] = request.form['recipient']
-        session['num'] = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]}).count()
-        
-        return redirect(url_for('room', chats = list))
+        recipient = request.form['recipient']
+        list = chat_history.find({'$or': [{'$and' : [{'recipient' : recipient, 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : recipient}]}]})
+        num = chat_history.find({'$or': [{'$and' : [{'recipient' : recipient, 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : recipient}]}]}).count()
+        print(num + 'fuck')
+
+        if num == None:
+            request.insert_one({True: session['user'], False : recipient})
+            return """
+            <div align='center'>
+                <h3>Chat request has been sent successfully to {{recipient}}</h3>
+                <h3>Please wait for them to accept the request!</h3>
+                </br>
+                <a href = "enterance">Return to the previous page</a>
+            </div>
+            """
+        else:
+            session['num'] = num
+            session['recipient'] = recipient
+            return redirect(url_for('room', chats = list))
 
     return render_template('enterance.html')
 
