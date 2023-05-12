@@ -3,11 +3,9 @@ from src import myapp_obj
 
 #import flask libraries
 from flask import render_template, request, redirect, url_for, session
-from run import emails, todos, users, socketio, chat_history, roomz
-from flask_socketio import join_room, leave_room, send, emit
-import random
-from string import ascii_uppercase
+from run import emails, todos, users, chat_history, request
 from bson.objectid import ObjectId
+
 
 myapp_obj.secret_key = "SEAMAIL.HQ"
 
@@ -22,10 +20,15 @@ def index():
 @myapp_obj.route('/sendMail', methods=['GET', 'POST'])
 def sendEmail():
     if request.method == 'POST':
+        #if(users.find({'username': session['user'], 'blocked': True})):
+        #    sub = request.form['sub']
+        #    msg = request.form['msg']
+        #    rec = request.form['recipe']
+        #    blocked.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False})
         sub = request.form['sub']
         msg = request.form['msg']
         rec = request.form['recipe']
-        emails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg})
+        emails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False})
         return redirect(url_for('listEmails'))
     else:
         return render_template('mailroom.html', message='message not sent', current_user = session['user'])
@@ -35,6 +38,30 @@ def sendEmail():
 def listEmails():
     maillist = emails.find({'username': session['user']})
     return render_template('mailroom.html', emails=maillist, current_user = session['user'])
+
+#list outbox emails from database
+@myapp_obj.route('/outbox', methods=['GET', 'POST'])
+def listOutbox():
+    maillist = emails.find({'delete': False})
+    return render_template('outbox.html', sent=maillist, current_user = session['user'])
+
+#unsend emails for both sender and receiver
+@myapp_obj.route('/unsendEmail/<oid>', methods=['GET', 'POST'])
+def unsendEmail(oid):
+    if request.method == 'POST':
+        emails.update_one({'_id': ObjectId(oid)}, {'$set': {'delete': True}})
+        emails.delete_one({'delete': True})
+        return redirect(url_for('listOutbox'))
+    return render_template('outbox.html', sent='Error Loading Outbox')
+
+#delete email for the current user's mailroom
+@myapp_obj.route('/delEmail/<oid>', methods=['GET', 'POST'])
+def delEmail(oid):
+    if request.method == 'POST':
+        emails.update_one({'_id': ObjectId(oid)}, {'$set': {'delete': True}})
+        emails.delete_one({'delete': True})
+        return redirect(url_for('listEmails'))
+    return render_template('mailroom.html', emails='Error Loading Mailroom')
 
 #render todolist
 @myapp_obj.route('/todolist', methods=['GET', 'POST'])
@@ -49,7 +76,7 @@ def addTodo():
         todoitem = request.form['todoitem']
         todos.insert_one({'username': session['user'], 'item': todoitem, 'delete': False})
         getTodoItem = todos.find({'username': session['user']})
-        return render_template('todo.html', todos=getTodoItem, username=session['user'])
+        return redirect(url_for('todo'))
     return render_template('todo.html', todos='Todo Not Rendered')
 
 #remove item from todo list database collection
@@ -58,8 +85,7 @@ def remTodo(oid):
     if request.method == 'POST':
         todos.update_one({'_id': ObjectId(oid)}, {'$set': {'delete': True}})
         todos.delete_one({'delete': True})
-        getTodoItem = todos.find({'username': session['user']})
-        return render_template('todo.html', todos=getTodoItem, username=session['user'])
+        return redirect(url_for('todo'))
     return render_template('todo.html', todos='Todo Not Rendered')
 
 @myapp_obj.route('/logout', methods = ['GET', 'POST'])
@@ -150,57 +176,60 @@ def changePassword():
 
     return render_template('password_change.html')
 
-@myapp_obj.route('/chatroom', methods = ['GET', 'POST'])
-def chatroom():
+@myapp_obj.route('/enterance', methods = ['GET', 'POST'])
+def enterance():
     if request.method == 'POST':
-        if 'create_room' in request.form:
-            session['room'] = generate_unique_code(4)
-            roomz.insert_one({'code':session['room']})
-            session['recipient'] = request.form['recipient']
-            new_chat = {'room_num' : session['room'], 'recipient' : session['recipient'], 'sender' : session['user'], 'chats' : ['hi']}
-            chat_history.insert_one(new_chat)
-        elif 'enter_room' in request.form:
-            session['room'] = request.form['room_number']
-            session['recipient'] = request.form['recipient']
-        return redirect(url_for('room'))
+        recipient = request.form['recipient']
+        list = chat_history.find({'$or': [{'$and' : [{'recipient' : recipient, 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : recipient}]}]})
+        num = chat_history.find({'$or': [{'$and' : [{'recipient' : recipient, 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : recipient}]}]}).count()
+        print(num + 'fuck')
 
-    return render_template('chatroom.html')
+        if num == None:
+            request.insert_one({True: session['user'], False : recipient})
+            return """
+            <div align='center'>
+                <h3>Chat request has been sent successfully to {{recipient}}</h3>
+                <h3>Please wait for them to accept the request!</h3>
+                </br>
+                <a href = "enterance">Return to the previous page</a>
+            </div>
+            """
+        else:
+            session['num'] = num
+            session['recipient'] = recipient
+            return redirect(url_for('room', chats = list))
+
+    return render_template('enterance.html')
+
+
 
 @myapp_obj.route('/room', methods = ['GET', 'POST'])
 def room():
-    username = request.args.get('username')
-    room = session['room']
-    return render_template('room.html', username=username, room=room)
+    list = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]})
 
+    if request.method == 'GET':
+        return render_template('room.html', chats = list)
+    num_message = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]}).count()
+    if session['num'] != num_message:
+        session['num'] = num_message
+        return render_template('room.html', chats = list)
 
-#Socket.io commands ---------------------------------------------------------------------------------------------------------------------
-@socketio.on('send_message')
-def handle_send_message_event(data):
-    myapp_obj.logger.info("{} has sent message to the room {}: {}".format(data['username'],
-                                                                    data['room'],
-                                                                    data['message']))
-    socketio.emit('receive_message', data, room=data['room'])
+    if request.method == 'POST':
+        if 'exit' in request.form:
+            session.pop('recipient')
+            session.pop('num')
+            return redirect(url_for('enterance'))
 
+        new_msg = request.form['message']
+        chat_history.insert_one({'sender' : session['user'], 'recipient' : session['recipient'], 'message' : new_msg})
+        list = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},
+        {'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]})
+        session['num'] = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},
+        {'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]}).count()
+        return render_template('room.html', chats = list)
+    
+    
 
-@socketio.on('join_room')
-def handle_join_room_event(data):
-    myapp_obj.logger.info("{} has joined the room {}".format(data['username'], data['room']))
-    join_room(data['room'])
-    socketio.emit('join_room_announcement', data, room=data['room'])
+    return render_template('room.html', chats = list)
 
-
-@socketio.on('leave_room')
-def handle_leave_room_event(data):
-    myapp_obj.logger.info("{} has left the room {}".format(data['username'], data['room']))
-    leave_room(data['room'])
-    socketio.emit('leave_room_announcement', data, room=data['room'])
-
-def generate_unique_code(length):
-    while True:
-        code = ""
-        for _ in range(length):
-            code += random.choice(ascii_uppercase)
-        if roomz.find_one({'code' : code}) == None:
-            break
-    return code
 
