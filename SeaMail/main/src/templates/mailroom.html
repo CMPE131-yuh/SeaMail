@@ -1,0 +1,106 @@
+{% extends "base.html" %} {% block title %}Your Mailroom{% endblock %} {% block
+link%} rel="stylesheet" href="{{ url_for('static',
+filename='public/mailroom.css') }}" {% endblock %} {% block navbar%}
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: rgba(247, 247, 247, 0.15); backdrop-filter: blur(5px)"">    
+  <div class="container-fluid justify-content-center">
+      <div class="navbar-header">
+          <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
+      </div>
+      <ul class="navbar-nav mr-auto">
+          <li class="nav-item"><a class="nav-link text-warning h4" href="/chat">Chat</a></li>
+          <li class="nav-item"><a class="nav-link text-warning h4" href="/todolist">TodoList</a></li>
+          <li class="nav-item"><a class="nav-link text-warning h4" href="/outbox">Outbox</a></li>
+      </ul>
+      <a class="nav-link btn btn-outline-dark" href="logout">Account</a>
+  </div>
+</nav>
+{% endblock%} {% block content%}
+<h1>Email List for {{current_user}}</h1>
+<form method="POST" action="{{url_for('sendEmail')}}">
+    <label>To: </label>
+    <input type="text" name="recipe" required>
+    <label>Subject: </label>
+    <input type="text" name="sub" required>
+    <label>Message: </label>
+    <input type="text" name="msg" required>
+    <input type="submit" value="Send Email">
+</form>
+<div class="panel panel-default m-t-20 bg-white rounded overflow-hidden">
+  <div class="panel-body">
+    <table class="table table-striped">
+      <tbody>
+        {% for i in emails %}
+        <tr>
+          <td class="mail-select">
+            <label class="cr-styled">
+              <input type="checkbox" /><i class="fa"></i>
+            </label>
+          </td>
+          <td>
+            <i class="fa fa-circle text-info m-r-15"></i>
+            {{i.sender}}
+          </td>
+          <td>
+            <a href="#" data-toggle="modal" data-target="#{{i}}"
+              >{{i.subject}}</a
+            >
+          </td>
+          <td>
+            <form method="POST" action="{{url_for('delEmail', oid=i._id)}}">
+              <button class="btn btn-outline-dark">
+                <i class="fa fa-trash"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+
+        <div
+          class="modal fade"
+          id="{{i}}"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="exampleModalCenterTitle"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">
+                  {{i.subject}}
+                </h5>
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">{{i.message}}</div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-dismiss="modal"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<!--{% for i in emails %}
+<ul>
+  <li>{{loop.index}}</li>
+  <li>{{i.sender}}</li>
+  <li>{{i.subject}}</li>
+  <li>{{i.message}}</li>
+</ul>
+{% endfor %} -->
+{% endblock%}
