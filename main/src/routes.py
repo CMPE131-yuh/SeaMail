@@ -132,8 +132,7 @@ def logout():
         elif 'change_password' in request.form:
             return redirect(url_for('changePassword'))
         elif 'request_lists' in request.form:
-            req = request.find_one({False : session['user']})
-            return redirect(url_for('requestlists'), requests = req)
+            return redirect(url_for('requestlists'))
     return render_template('logout.html', current_user = session['user'])
 
 #login into user account, redirect into user mailroom
@@ -142,6 +141,7 @@ def login():
     if request.method == 'POST':
         name = request.form['username']
         psw = request.form['password']
+        print('hey')
         if users.find_one({'username':name, 'password':psw}) != None:
             session['user'] = name
             return redirect(url_for('listEmails'))
@@ -183,11 +183,10 @@ def afterLogout():
 @myapp_obj.route('/change_password', methods = ['GET', 'POST'])
 def changePassword():
     if request.method == 'POST':
-        check_username = users.find_one({'username' : request.form['username'], 'password' : request.form['current_password']})
-        check_email = users.find_one({'email' : request.form['username'], 'password' : request.form['current_password']})
+        check = users.find_one({'$or': [{'$and' : [{'username' : request.form['username'], 'password':request.form['current_password']}]},{'$and' : [{'email' : request.form['username'], 'password' : request.form['current_password']}]}]})
         new = request.form['new_password']
 
-        if check_email == None and check_username == None:
+        if check == None:
             return """
             <div align='center'>
                 <h3>Wrong combination of username/email and password</h3>
@@ -289,7 +288,7 @@ def unblock(oid):
         flash("User Unblocked")
         return redirect(url_for('listAccounts'))
 
-@myapp_obj.route('requestlist.html')
+@myapp_obj.route('/requestlists/<oid>', methods=['GET', 'POST'])
 def requestlists(oid):
     req = request.find_one({False : session['user']})
     if request.method == 'POST':
