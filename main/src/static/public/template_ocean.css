@@ -2,7 +2,7 @@ body {
   background: #5E9EFF;
   margin: 0;
   background-image: linear-gradient(0deg, #42297b, #48afef);
-  overflow: hidden;
+  overflow : hidden;
 }
 
 .bubbles {
