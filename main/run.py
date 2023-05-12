@@ -19,7 +19,7 @@ emails = pymongo.collection.Collection(db, 'emails')
 todos = pymongo.collection.Collection(db, 'todolist')
 users = pymongo.collection.Collection(db, 'users')
 chat_history = pymongo.collection.Collection(db, 'chat')
-roomz = pymongo.collection.Collection(db, 'roomz')
+request = pymongo.collection.Collection(db, 'requests')
 blocked = pymongo.collection.Collection(db, 'blocked')
 blockedEmails = pymongo.collection.Collection(db, 'blockedEmails')
 
