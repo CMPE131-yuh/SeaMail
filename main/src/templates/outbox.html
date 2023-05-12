@@ -1,23 +1,35 @@
-{% extends "base.html" %} {% block title %}Your Mailroom{% endblock %} {% block
-    link%} rel="stylesheet" href="{{ url_for('static',
-    filename='public/mailroom.css') }}" {% endblock %} {% block navbar%}
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: rgba(247, 247, 247, 0.15); backdrop-filter: blur(5px)"">    
-      <div class="container-fluid justify-content-center">
-          <div class="navbar-header">
-              <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
-          </div>
-          <ul class="navbar-nav mr-auto">
-              <li class="nav-item"><a class="nav-link text-warning h4" href="/enterance">Chat</a></li>
-              <li class="nav-item"><a class="nav-link text-warning h4" href="/todolist">TodoList</a></li>
-              <li class="nav-item"><a class="nav-link text-warning h4" href="/outbox">Outbox</a></li>
-          </ul>
-          <a class="nav-link btn btn-outline-dark" href="logout">Account</a>
-      </div>
-    </nav>
-    {% endblock%} {% block content%}
+{% extends "base.html" %} {% block title %}TodoList{% endblock %}
+{% block navbar%}
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: rgba(247, 247, 247, 0.15); backdrop-filter: blur(5px)">
+  <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link text-warning" href="/enterance">Chat</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-warning" href="/todolist">Todo List<span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-warning" href="/outbox">Outbox</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-warning" href="/accounts">Other Users</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link btn text-warning" href="/logout">Your Account</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+{% endblock %} {% block content%}
     <body>
-        <h1>{{current_user}}'s Outbox</h1>
-        <h3>Sent Emails</h3>
+        <h1 class="text-warning bold">{{current_user}}'s Outbox</h1>
+        <h3 class="text-warning bold">Sent Emails</h3>
         <div class="panel panel-default m-t-20 bg-white rounded overflow-hidden">
             <div class="panel-body">
               <table class="table table-striped">

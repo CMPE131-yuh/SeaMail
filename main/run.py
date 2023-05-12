@@ -3,6 +3,7 @@ from dotenv import dotenv_values
 from flask_pymongo import pymongo
 from pymongo.mongo_client import MongoClient
 from flask_socketio import SocketIO, emit
+import gridfs
 
 from src import myapp_obj
 
@@ -20,6 +21,9 @@ users = pymongo.collection.Collection(db, 'users')
 chat_history = pymongo.collection.Collection(db, 'chat')
 roomz = pymongo.collection.Collection(db, 'roomz')
 blocked = pymongo.collection.Collection(db, 'blocked')
+blockedEmails = pymongo.collection.Collection(db, 'blockedEmails')
+
+grid_fs = gridfs.GridFS(db)
 
 if __name__ == '__main__':
     socketio.run(myapp_obj, debug = True, host='10.250.68.86', port=5000)
