@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% block title %}Your Mailroom{% endblock %} {% block
+    link%} rel="stylesheet" href="{{ url_for('static',
+    filename='public/mailroom.css') }}" {% endblock %} {% block navbar%}
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: rgba(247, 247, 247, 0.15); backdrop-filter: blur(5px)"">    
+      <div class="container-fluid justify-content-center">
+          <div class="navbar-header">
+              <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
+          </div>
+          <ul class="navbar-nav mr-auto">
+              <li class="nav-item"><a class="nav-link text-warning h4" href="/chat">Chat</a></li>
+              <li class="nav-item"><a class="nav-link text-warning h4" href="/todolist">TodoList</a></li>
+              <li class="nav-item"><a class="nav-link text-warning h4" href="/outbox">Outbox</a></li>
+          </ul>
+          <a class="nav-link btn btn-outline-dark" href="logout">Account</a>
+      </div>
+    </nav>
+    {% endblock %}
+    {% block content %}
+    {% for i in view %}
+    <img src="{{i.img}}">
+    {% endfor %}
+    {% endblock %}    

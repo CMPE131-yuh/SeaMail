@@ -1,41 +1,46 @@
 {% extends "base.html" %} {% block title %}TodoList{% endblock %}
 {% block navbar%}
-<nav class="navbar navbar-expand-lg navbar-light" style="background-color: rgba(247, 247, 247, 0.15); backdrop-filter: >    <div class="container-fluid justify-content-center">
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: rgba(247, 247, 247, 0.15); backdrop-filter: blur(5px)"">    
+    <div class="container-fluid justify-content-center">
         <div class="navbar-header">
-            <a class="navbar-brand text-warning bold h4" href="#">SeaMail</a>
+            <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
         </div>
         <ul class="navbar-nav mr-auto">
             <li class="nav-item"><a class="nav-link text-warning h4" href="/chat">Chat</a></li>
             <li class="nav-item"><a class="nav-link text-warning h4" href="/todolist">TodoList</a></li>
+            <li class="nav-item"><a class="nav-link text-warning h4" href="/outbox">Outbox</a></li>
         </ul>
         <a class="nav-link btn btn-outline-dark" href="logout">Account</a>
     </div>
 </nav>
-{% endblock%}
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>You're ToDo List</title>
-    </head>
-    <body>
-        <h1>ToDo List</h1>
+{% endblock %}
+{% block content %}
+    <h1>{{username}}'s To Do List</h1>
         <form method="POST" action="{{url_for('addTodo')}}">
             <label for="todoitem">Todo Item:</label>
             <input type="text" id="item" name="todoitem">
             <button type="submit">Add Todo</button>
         </form>
-        {% for i in todos %}
-        <ul>
-            <li>
-                {{i.item}}
-                <form method="POST" action="{{url_for('remTodo')}}">
-                    <button type="submit">Remove Todo</button>
-                </form>
-            </li>
-        </ul>
-        {% endfor %}
-    </body>
-</html>
- {% endblock %}
-
-</nav>
+        <div class="panel panel-default m-t-20 bg-white rounded overflow-hidden">
+            <div class="panel-body">
+              <table class="table table-striped">
+                <tbody>
+    {% for i in todos %}
+    <tr>
+        <td>
+          <a style="text-decoration: none;" href="#" data-toggle="modal" data-target="#{{i}}">{{i.item}}</a>
+        </td>
+        <td>
+          <form method="POST" action="{{url_for('remTodo', oid=i._id)}}">
+            <button type='submit' class="btn btn-outline-dark">
+              <i class="fa fa-trash"> Remove Todo</i>
+            </button>
+          </form>
+        </td>
+      </tr>    
+    {% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+{% endblock %}
