@@ -1,41 +1,38 @@
-{% extends "base.html" %} {% block title %}TodoList{% endblock %}
-{% block navbar%}
-<nav class="navbar navbar-expand-lg navbar-light" style="background-color: rgba(247, 247, 247, 0.15); backdrop-filter: blur(5px)">
-  <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+{% extends "base.html" %} {% block title %}Seamail Logout Page{% endblock %} {% block
+    link%} rel="stylesheet" href="{{ url_for('static',
+    filename='public/logout.css') }}" {% endblock %} {% block navbar%}
+    <nav
+    class="navbar navbar-expand-lg navbar-light"
+    style="
+      background-color: rgba(247, 247, 247, 0.15);
+      backdrop-filter: blur(5px);
+    "
+  >
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
+      </div>
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link btn btn-outline-dark h4 m-2 px-4" href="/chat"
+            >Chat</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link btn btn-outline-dark h4 m-2 px-4" href="/todolist"
+            >TodoList</a
+          >
+        </li>
+      </ul>
+      <a class="nav-link btn btn-outline-dark" href="logout">Account</a>
+    </div>
+  </nav>
+    {% endblock%}
+{% block content%}
+<div class="">
 
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link text-warning" href="/enterance">Chat</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-warning" href="/todolist">Todo List<span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-warning" href="/outbox">Outbox</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-warning" href="/accounts">Other Users</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link btn text-warning" href="/logout">Your Account</a>
-      </li>
-    </ul>
-  </div>
-</nav>
-{% endblock %}
-{% block content %}
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Seamail Logout Page</title>
-    </head>
-
-    <body>
-        <h1>{{current_user}}'s Account Page</h1>
+</div>
+<h1>{{current_user}}'s Account Page</h1>
         <p>Hello, {{current_user}}</p>
         <!--replace image with user's profile pic-->
         <!--<img src = "Blank-profile.png" alt="userpic" width="500" height="500"> </img>-->
@@ -47,15 +44,10 @@
     </br></br>
     <div align = "left">
         <form action="{{ url_for('logout') }}" method="POST">
-            <button id="logout" type = "submit" name = "logout_button" onclick = "alert('Are you sure?')">Log Out</button>
-            </br></br>
-            <button id="delete" type = "submit" name = "delete_button" onclick = "alert('Are you sure you want to delete your account?')">Delete Account</button>
-            </br></br>
-            <button id="change" type = "submit" name = "change_password">Change Password</button>
-            <button type="submit" name="request_list">Request List</button>
+            <button class="btn btn-outline-warning" type = "submit" name = "logout_button" onclick = "alert('Are you sure?')">Log Out</button>
+
+            <button class="btn btn-outline-warning" type = "submit" name = "delete_button" onclick = "alert('Are you sure you want to delete your account?')">Delete Account</button>
+            
         </form>
-        
     </div>
-    </body>
-</html>
-{% endblock %}
+{% endblock%}
