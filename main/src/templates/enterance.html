@@ -32,9 +32,22 @@
         <h2 class="text-warning">Enter the Chat Room</h2>
         <form action="{{ url_for('enterance') }}" method="POST">
             <div class="form-outline">
-                <input type="text" class="form-control" placeholder="Enter recipient's username or email" name="recipient">
+                <input type="text" class="form-control" placeholder="Enter recipient's username" name="recipient">
                 <button class="btn btn-secondary" type="submit" name="create_room">Start a New Message Thread</button>
             </div>
         </form>
+      </br></br>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+          <ul style="text-decoration: none; background-color: aliceblue; border-radius: 10px;">
+            <p style="text-decoration: none;">{{ message }}</p>
+          </ul>
+
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
     </div>
+
+  
 {% endblock %}
