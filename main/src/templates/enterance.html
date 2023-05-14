@@ -47,58 +47,53 @@
         {% endfor %}
         {% endif %}
         {% endwith %}
-        <div class="d-flex justify-content-between mx-100">
-          <div class="panel panel-default m-t-20 bg-white rounded overflow-hidden col-md-6 mr-2">
-            <div class="panel-body">
-              <h2 class="text-primary">Your message threads: </h2>
-              <table class="table table-striped">
-                <tbody>
-                  {% for i in accepted %}
+
+        <p>Your message threads: </p>
+        {% for i in accepted %}
+          <table>
+            <tr>
+              <td>
+                {% if i.request == user %}
+                  {{i.receive}}
+                {% endif %}
+                {% if i.receive == user %}
+                  {{i.request}}
+                {% endif %}
+              </td>
+              <td>
+                <form method="POST" action="{{url_for('enterChat', oid = i._id)}}">
+                  <button class="btn btn-outline-dark" name="enter">Enter this chat</button>
+                </form>
+              </td>
+            </tr>
+            
+          </table>
+          
+
+        {% endfor %}
+        
+
+        <div class="panel panel-default m-t-20 bg-white rounded overflow-hidden">
+          <div class="panel-body">
+            <h2>Chat request list for: {{user}}</h2>
+            <table class="table table-striped">
+              <tbody>
+                {% for i in requests %}
                 <tr>
                   <td>
-                    <i class="fa fa-circle text-primary m-r-15"></i>
-                    {% if i.request == user %}
-                      {{i.receive}}
-                    {% endif %}
-                    {% if i.receive == user %}
-                      {{i.request}}
-                    {% endif %}
+                    <i class="fa fa-circle text-info m-r-15"></i>
+                    {{i.request}}
                   </td>
-                  <td class="d-flex justify-content-start">
-                    <form method="'POST" action="{{url_for('enterChat', oid = i._id)}}">
-                      <button class="btn btn-outline-dark" name="enter">Enter this chat</button>
+                  <td>
+                    <form method="POST" action="{{url_for('acceptOrDecline', oid=i._id)}}">
+                      <button class="btn btn-outline-dark" name="accept">accept</button>
+                      <button class="btn btn-outline-dark" name="decline">decline</button>
                     </form>
                   </td>
                 </tr>
                 {% endfor %}
-               </tbody>
-              </table>
-            </div>
-          </div> 
-          
-  
-          <div class="panel panel-default m-t-20 bg-white rounded overflow-hidden col-md-6 ml-1">
-            <div class="panel-body">
-              <h2 class="text-info">Chat request list for: {{user}}</h2>
-              <table class="table table-striped">
-                <tbody>
-                  {% for i in requests %}
-                  <tr>
-                    <td>
-                      <i class="fa fa-circle text-info m-r-15"></i>
-                      {{i.request}}
-                    </td>
-                    <td>
-                      <form method="POST" action="{{url_for('acceptOrDecline', oid=i._id)}}">
-                        <button class="btn btn-outline-dark" name="accept">accept</button>
-                        <button class="btn btn-outline-dark" name="decline">decline</button>
-                      </form>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
+              </tbody>
+            </table>
           </div>
         </div>
     </div>

@@ -2,20 +2,19 @@
 from src import myapp_obj
 
 #import flask libraries
-from flask import send_file, render_template, request, redirect, url_for, session, flash
+from flask import render_template, request, redirect, url_for, session, flash
 from flask_socketio import send
 from bson.objectid import ObjectId
 from bson import Binary
 from PIL import Image
-from matplotlib.pyplot import imshow, show
+import matplotlib.pyplot as plt
 import codecs
-import base64
 
 import io
 import random
 from string import ascii_uppercase
 
-from run import emails, todos, users, chat_history, grid_fs, blocked, blockedEmails, image, requests
+from run import emails, todos, users, chat_history, request, grid_fs, blocked, blockedEmails
 
 myapp_obj.secret_key = "SEAMAIL.HQ"
 
@@ -37,13 +36,10 @@ def sendEmail():
             blockedEmails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False, 'notify': True})
             flash("This User Has Blocked You")
             return redirect(url_for('listEmails'))
-        elif request.files:
-            emailImage = request.files['image']
-            image_data = emailImage.split(',')[1]
-            image_binary = base64.b64encode(image_data)
-            image.insert_one({'image': image_binary}).inserted_id
-            emails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False, 'imager': image_binary, 'hasImg': True})
-            return redirect(url_for('listEmails'))
+        #if request.files:
+        #    emailImage = request.files['image']
+        #    image = grid_fs.put(emailImage, content_type = pimage.content_type)
+        #    emails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False, 'img': image, 'hasImg': True})
         else:
             emails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False, 'hasImg': False, 'notify': True})
             return redirect(url_for('listEmails'))
@@ -54,12 +50,12 @@ def sendEmail():
 @myapp_obj.route('/openImage/<oid>', methods=['GET', 'POST'])
 def openImage(oid):
     if request.method == 'POST':
-        images = image.find_one({'_id': ObjectId(oid)})
-        if images:
-            dataurl = images['image']
-            image_base64 = base64.b64encode(dataurl).decode('utf-8')
-            return render_template('viewImage.html', image_data = image_base64)
-
+        item = emails.find_one({'_id': oid})
+        image = grid_fs.get(item['_id'])
+        base64_data = codecs.encode(image.read(), 'base64')
+        image = base64_data.decode('utf-8')
+        return render_template('viewImage.html', image = image)
+    
 #list emails from database
 @myapp_obj.route('/mailroom', methods=['GET', 'POST'])
 def listEmails():
@@ -135,6 +131,8 @@ def logout():
             return redirect(url_for('login'))
         elif 'change_password' in request.form:
             return redirect(url_for('changePassword'))
+        elif 'request_lists' in request.form:
+            return redirect(url_for('requestlists'))
     return render_template('logout.html', current_user = session['user'])
 
 #login into user account, redirect into user mailroom
@@ -143,6 +141,7 @@ def login():
     if request.method == 'POST':
         name = request.form['username']
         psw = request.form['password']
+        print('hey')
         if users.find_one({'username':name, 'password':psw}) != None:
             session['user'] = name
             return redirect(url_for('listEmails'))
@@ -214,42 +213,49 @@ def changePassword():
 def enterance():
     if request.method == 'POST':
         recipient = request.form['recipient']
-        print(recipient)
-        num = requests.find({'$or' : [{'request' : session['user'] , 'receive' : recipient}, {'receive' : session['user'], 'request' : recipient}]}).count()
-        if users.find_one({'username' : recipient}) == None or recipient == session['user']:
-            flash('Invalid username!')
-        elif num == 0:
-            requests.insert_one({'request': session['user'], 'receive' : recipient, 'request2' : 'True', 'receive2' : 'False'})
-            flash('Request successfully sent to ' + recipient + ' !')
-        elif requests.find_one({'request' : session['user'], 'receive2' : 'False'}) != None:
-            flash('You have already requested the user to start a chat!\n Please wait for the other user to accept your request.')
-        elif requests.find_one({'receive' : recipient, 'receive2' : 'False'}) != None:
-            flash('This user has already sent you a request. \nPlease go to account page >> request list, to accept the request.')
+
+        if users.find_one({'username' : recipient}) == None:
+            flash('User does not exist! Please try again')
+
+        list = chat_history.find({'$or': [{'$and' : [{'recipient' : recipient, 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : recipient}]}]})
+        num = chat_history.find({'$or': [{'$and' : [{'recipient' : recipient, 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : recipient}]}]}).count()
+
+        if list == None:
+            request.insert_one({True: session['user'], False : recipient})
+            return """
+            <div align='center'>
+                <h3>Chat request has been sent successfully to {{recipient}}</h3>
+                <h3>Please wait for them to accept the request!</h3>
+                </br>
+                <a href = "enterance">Return to the previous page</a>
+            </div>
+            """
+        elif request.find_one({'True' : session['user'], 'False' : recipient}) != None:
+            flash('Please for the recipient to accept your request!')
         else:
-            list = chat_history.find({'$or': [{'recipient' : recipient, 'sender':session['user']},{'recipient' : session['user'], 'sender' : recipient}]})
             session['recipient'] = recipient
-            return redirect(url_for('room'))
-    req = requests.find({'receive' : session['user'], 'receive2' : 'False'})
-    accepted = requests.find({'$or' : [{'request' : session['user'], 'receive2' : 'True'}, {'receive' : session['user'], 'receive2' : 'True'}]})
-    return render_template('enterance.html', user = session['user'], requests = req, accepted = accepted)
+            return redirect(url_for('room', chats = list))
+
+    return render_template('enterance.html')
 
 @myapp_obj.route('/room', methods = ['GET', 'POST'])
 def room():
-    list = chat_history.find({'$or': [{'recipient' : session['recipient'], 'sender':session['user']},{'recipient' : session['user'], 'sender' : session['recipient']}]})
+    list = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},{'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]})
+
     if request.method == 'GET':
         return render_template('room.html', chats = list)
 
     if request.method == 'POST':
         if 'exit' in request.form:
             session.pop('recipient')
-            session.pop('num')
             return redirect(url_for('enterance'))
 
         new_msg = request.form['message']
         chat_history.insert_one({'sender' : session['user'], 'recipient' : session['recipient'], 'message' : new_msg})
-        list = chat_history.find({'$or': [{'recipient' : session['recipient'], 'sender':session['user']},{'recipient' : session['user'], 'sender' : session['recipient']}]})
+        list = chat_history.find({'$or': [{'$and' : [{'recipient' : session['recipient'], 'sender':session['user']}]},
+        {'$and' : [{'recipient' : session['user'], 'sender' : session['recipient']}]}]})
         return render_template('room.html', chats = list)
-    
+
     return render_template('room.html', chats = list)
 
 #render user lists
@@ -279,31 +285,15 @@ def unblock(oid):
             if blockedEmails.count_documents({'sender': nameUnblocked}) != 0:
                 blockedEmail = blockedEmails.find_one({'sender': nameUnblocked})
                 emails.insert_one(blockedEmail)
-        blocked.delete_one({'username': session['user'], 'userBlock': nameUnblocked})
         flash("User Unblocked")
         return redirect(url_for('listAccounts'))
-    
 
-@myapp_obj.route('/request/<oid>', methods = ['GET', 'POST'])
-def acceptOrDecline(oid):
-    recipient = requests.find_one({'_id' : ObjectId(oid)}).get('request')
+@myapp_obj.route('/requestlists/<oid>', methods=['GET', 'POST'])
+def requestlists(oid):
+    req = request.find_one({False : session['user']})
     if request.method == 'POST':
         if 'accept' in request.form:
-            query = {'_id' : ObjectId(oid)}
-            update = { "$set": { "receive2": 'True' } }
-            requests.update_one(query, update)
-            flash('Accepted chat request from ' + recipient)
+            request.update_one({'_id' : ObjectId(oid)}, {'$set' : {True : session['user']}})
         elif 'decline' in request.form:
-            requests.delete_one({'_id' : ObjectId(oid)})
-            flash('Declined chat request from ' + recipient)
-        return redirect(url_for('enterance'))
-
-@myapp_obj.route('/enter/<oid>', methods = ['GET', 'POST'])
-def enterChat(oid):
-    if request.method == 'POST':
-        if requests.find_one({'_id' : ObjectId(oid)}).get('request') != session['user']:
-            session['recipient'] = requests.find_one({'_id' : ObjectId(oid)}).get('request')
-        else:
-            session['recipient'] = requests.find_one({'_id' : ObjectId(oid)}).get('receive')
-        
-    return redirect(url_for('room'))
+            request.delete_one({'_id' : ObjectId(oid)})
+    return render_template('requestlist.html', requests = req)
