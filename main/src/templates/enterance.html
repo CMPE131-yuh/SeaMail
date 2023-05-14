@@ -1,11 +1,13 @@
 {% extends "base.html" %} {% block title %}TodoList{% endblock %}
+{% block
+  link%}rel="stylesheet" href="{{ url_for('static',
+  filename='public/mailroom.css') }}"{% endblock%}
 {% block navbar%}
 <nav class="navbar navbar-expand-lg navbar-light" style="background-color: rgba(247, 247, 247, 0.15); backdrop-filter: blur(5px)">
   <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
@@ -24,6 +26,17 @@
         <a class="nav-link btn text-warning" href="/logout">Your Account</a>
       </li>
     </ul>
+    <div class="custom-control custom-switch">
+      <input
+        type="checkbox"
+        class="custom-control-input"
+        id="customSwitches"
+        onclick="myFunction()"
+      />
+      <label class="custom-control-label text-warning" for="customSwitches"
+        >Dark Mode</label
+      >
+    </div>
   </div>
 </nav>
 {% endblock %}
@@ -43,15 +56,14 @@
           <ul style="text-decoration: none; background-color: aliceblue; border-radius: 10px;">
             <p style="text-decoration: none;">{{ message }}</p>
           </ul>
-
         {% endfor %}
         {% endif %}
         {% endwith %}
         <div class="d-flex justify-content-between mx-100">
-          <div class="panel panel-default m-t-20 bg-white rounded overflow-hidden col-md-6 mr-2">
+          <div class="panel panel-default m-t-20 my-div bg-white rounded overflow-hidden col-md-6 mr-2">
             <div class="panel-body">
               <h2 class="text-primary">Your message threads: </h2>
-              <table class="table table-striped">
+              <table class="table table-striped myTable">
                 <tbody>
                   {% for i in accepted %}
                 <tr>
@@ -65,8 +77,8 @@
                     {% endif %}
                   </td>
                   <td class="d-flex justify-content-start">
-                    <form method="'POST" action="{{url_for('enterChat', oid = i._id)}}">
-                      <button class="btn btn-outline-dark" name="enter">Enter this chat</button>
+                    <form method="POST" action="{{url_for('enterChat', oid = i._id)}}">
+                      <button class="btn btn-outline-dark my-button" name="enter">Enter this chat</button>
                     </form>
                   </td>
                 </tr>
@@ -77,10 +89,10 @@
           </div> 
           
   
-          <div class="panel panel-default m-t-20 bg-white rounded overflow-hidden col-md-6 ml-1">
+          <div class="panel panel-default m-t-20 my-div bg-white rounded overflow-hidden col-md-6 ml-1">
             <div class="panel-body">
               <h2 class="text-info">Chat request list for: {{user}}</h2>
-              <table class="table table-striped">
+              <table class="table table-striped myTable">
                 <tbody>
                   {% for i in requests %}
                   <tr>
@@ -90,8 +102,8 @@
                     </td>
                     <td>
                       <form method="POST" action="{{url_for('acceptOrDecline', oid=i._id)}}">
-                        <button class="btn btn-outline-dark" name="accept">accept</button>
-                        <button class="btn btn-outline-dark" name="decline">decline</button>
+                        <button class="btn btn-outline-dark my-button" name="accept">accept</button>
+                        <button class="btn btn-outline-dark my-button" name="decline">decline</button>
                       </form>
                     </td>
                   </tr>

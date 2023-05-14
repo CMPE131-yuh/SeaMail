@@ -33,25 +33,17 @@
   - We are all on track with our progress, by next meeting we should have general foundations layed out for the most part with frontend layout and at least db crud management.
 
 ### 2023-05-05
-- 
-- 
-  - 
-- 
+- Team UPdates
+- Mj Finished backend for sending emails, making todo lists, and rendering those pages with an unsend emails function
+- Hana finished login and registratin and tied it together to work with specific user pages based on rest api requests
+- Minh and Anthony finsihed up bubble animations and bootstrap segments of each page
+  - Summarize Group Progress
+- Build first connections between frontend and backend with the pymongo api for mongodb atlas as an external database
 
 ### 2023-05-12
-- 
--
-  - 
-- 
-
-### 2023-05-19
-- 
-- 
-  - 
-- 
-
-### 2023-05-26
--
-- 
-  - 
-- 
+- Team Updates
+- Mj finished blocked and unblocked with notifications on new emails
+- Hana finished the major backend segments for sending out chat messages with message send requests
+- Minh and Anthony finish final designs to be incorporated into the final produc
+  - Summarize Group Progress
+- Final tests were conducted and the frontend and backend was completely up to date with our 12 requirements

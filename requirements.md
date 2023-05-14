@@ -1,23 +1,23 @@
 ## Functional Requirements
 
-1. User Registration
-2. User Login
-3. Undo messaging and unsend emails
-4. Compose realtime message to chat with another user
-5. Todo List (Using external API)
-6. Users can change their password upon providing the correct informations
-7. Compose message to send email to another user
-8. User creates block list to stop someone sending email or chat to them
-9. User Logout
-10. Notification for new messages, emails
-11. Users are able to attach images to emails
-12. Users send message request to a designated recipient
-13. Delete account
+1. User Registration(Anthony, Hana)
+2. User Login(Minh)
+3. Undo messaging and unsend emails(Mj(Marlon))
+4. Compose realtime message to chat with another user(Hana)
+5. Todo List (Using external API)(Mj)
+6. Users can change their password upon providing the correct informations(Hana)
+7. Compose message to send email to another user(Mj)
+8. User creates block list to stop someone sending email or chat to them(Mj)
+9. User Logout(Hana, Minh)
+10. Notification for new messages, emails(Mj, Minh)
+11. Users are able to attach images to emails(Mj)
+12. Users send message request to a designated recipient(Hana, Anthony)
+13. Delete account(Hana)
 
 ## Non-functional Requirements
 
-1. UI interactive interface (or using elements from bootstrap)
-2. Light Mode and Dark Mode
+1. UI interactive interface (or using elements from bootstrap)(Minh, Anthony)
+2. Light Mode and Dark Mode(Minh)
 
 ## Use Cases
 
@@ -26,18 +26,17 @@
 - **Pre-condition:**
 
   1. User has a working email
-  2. User knows his/her/their birth information
+  2. User has a valid username
 
 - **Trigger:** User selects “Register Account” button
 
 - **Primary Sequence:**
 
   1. User enters full name
-  2. User enters birthday
-  3. User enters valid email address
-  4. User enters password
-  5. User clicks “Register” button
-  6. User gets redirected to email inbox
+  2. User enters valid email address
+  3. User enters password
+  4. User clicks “Register” button
+  5. User gets redirected to email inbox
 
 - **Primary Postconditions:** User can log in with the registered account
 
