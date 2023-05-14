@@ -2,7 +2,7 @@
 from src import myapp_obj
 
 #import flask libraries
-from flask import send_file, render_template, request, redirect, url_for, session, flash
+from flask import send_file, send_file, render_template, request, redirect, url_for, session, flash
 from flask_socketio import send
 from bson.objectid import ObjectId
 from bson import Binary
@@ -47,6 +47,16 @@ def sendEmail():
             return redirect(url_for('listEmails'))
     else:
         return render_template('mailroom.html', message='message not sent', current_user = session['user'])
+
+#open image that was sent from email
+@myapp_obj.route('/openImage/<oid>', methods=['GET', 'POST'])
+def openImage(oid):
+    if request.method == 'POST':
+        images = image.find_one({'_id': ObjectId(oid)})
+        if images:
+            dataurl = images['image']
+            image_base64 = base64.b64encode(dataurl).decode('utf-8')
+            return render_template('viewImage.html', image_data = image_base64)
 
 #list emails from database
 @myapp_obj.route('/mailroom', methods=['GET', 'POST'])
@@ -112,6 +122,8 @@ def remTodo(oid):
 #logout funcionality, logs out current user session
 @myapp_obj.route('/logout', methods = ['GET', 'POST'])
 def logout():
+    todolist = todos.find({'username' : session['user']}).count()
+    mails = emails.find({'username' : session['user']}).count()
     delete_user = session['user']
     if request.method == 'POST':
         if 'logout_button' in request.form:
@@ -123,7 +135,7 @@ def logout():
             return redirect(url_for('login'))
         elif 'change_password' in request.form:
             return redirect(url_for('changePassword'))
-    return render_template('logout.html', current_user = session['user'])
+    return render_template('logout.html', current_user = session['user'], todos = todolist, mails = mails)
 
 #login into user account, redirect into user mailroom
 @myapp_obj.route('/login', methods = ['GET', 'POST'])
@@ -173,6 +185,9 @@ def afterLogout():
 @myapp_obj.route('/change_password', methods = ['GET', 'POST'])
 def changePassword():
     if request.method == 'POST':
+        if 'back' in request.form:
+            print('hey')
+            return redirect(url_for('logout'))
         check = users.find_one({'$or': [{'$and' : [{'username' : request.form['username'], 'password':request.form['current_password']}]},{'$and' : [{'email' : request.form['username'], 'password' : request.form['current_password']}]}]})
         new = request.form['new_password']
         #Notifying if the user entered wrong username, email, or password

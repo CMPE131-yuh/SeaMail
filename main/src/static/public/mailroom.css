@@ -1,5 +1,9 @@
 body {
-    background: #5E9EFF;
-    margin: 0;
-    overflow: scroll;
-  }
+  background: #488ef7;
+  margin: 0;
+  overflow: scroll;
+}
+
+.dark-mode {
+  background: #071f43;
+}
