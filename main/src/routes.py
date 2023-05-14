@@ -15,7 +15,7 @@ import io
 import random
 from string import ascii_uppercase
 
-from run import emails, todos, users, chat_history, grid_fs, blocked, blockedEmails, image, requests
+from run import emails, todos, users, chat_history, grid_fs, blocked, blockedEmails, image, requests, mongo
 
 myapp_obj.secret_key = "SEAMAIL.HQ"
 
@@ -38,11 +38,9 @@ def sendEmail():
             flash("This User Has Blocked You")
             return redirect(url_for('listEmails'))
         elif request.files:
-            emailImage = request.files['image']
-            image_data = emailImage.split(',')[1]
-            image_binary = base64.b64encode(image_data)
-            image.insert_one({'image': image_binary}).inserted_id
-            emails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False, 'imager': image_binary, 'hasImg': True})
+            image = request.files['image']
+            grid_fs.save_file(image.filename, image)
+            emails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False, 'imager': image.filename, 'hasImg': True})
             return redirect(url_for('listEmails'))
         else:
             emails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False, 'hasImg': False, 'notify': True})
@@ -181,12 +179,13 @@ def register():
 def afterLogout():
     return render_template('logged_out.html')
 
+#Change password upon providing correct information
 @myapp_obj.route('/change_password', methods = ['GET', 'POST'])
 def changePassword():
     if request.method == 'POST':
         check = users.find_one({'$or': [{'$and' : [{'username' : request.form['username'], 'password':request.form['current_password']}]},{'$and' : [{'email' : request.form['username'], 'password' : request.form['current_password']}]}]})
         new = request.form['new_password']
-
+        #Notifying if the user entered wrong username, email, or password
         if check == None:
             return """
             <div align='center'>
@@ -196,12 +195,14 @@ def changePassword():
                 <a href = "change_password">Return to the previous page</a>
             </div>
             """
+        #Notifying when 2 inputs to check password do not match
         elif request.form['current_password'] != request.form['check_current']:
             return """
             <h3>The passwords don't match!</h3>
             </br>
             <a href = "change_password">Return to the previous page</a>
             """
+        #User is granted the permission to change password 
         else:
             query = {'username' : request.form['username']}
             update = { "$set": { "password": new } }
@@ -210,21 +211,26 @@ def changePassword():
 
     return render_template('password_change.html')
 
+#Entrance page before entering a chatroom with selected user
 @myapp_obj.route('/enterance', methods = ['GET', 'POST'])
 def enterance():
     if request.method == 'POST':
         recipient = request.form['recipient']
-        print(recipient)
         num = requests.find({'$or' : [{'request' : session['user'] , 'receive' : recipient}, {'receive' : session['user'], 'request' : recipient}]}).count()
+        #User cannot choose non existent user and self as a recipient
         if users.find_one({'username' : recipient}) == None or recipient == session['user']:
             flash('Invalid username!')
+        #Create a new request if both users have not yet requested to start a chat
         elif num == 0:
             requests.insert_one({'request': session['user'], 'receive' : recipient, 'request2' : 'True', 'receive2' : 'False'})
             flash('Request successfully sent to ' + recipient + ' !')
+        #Notify user if chat request to the selected user is already made 
         elif requests.find_one({'request' : session['user'], 'receive2' : 'False'}) != None:
             flash('You have already requested the user to start a chat!\n Please wait for the other user to accept your request.')
+        #Notify user if the selected user has made chat request and waiting for the user to accept
         elif requests.find_one({'receive' : recipient, 'receive2' : 'False'}) != None:
             flash('This user has already sent you a request. \nPlease go to account page >> request list, to accept the request.')
+        #Start the chat if both users accepted the request
         else:
             list = chat_history.find({'$or': [{'recipient' : recipient, 'sender':session['user']},{'recipient' : session['user'], 'sender' : recipient}]})
             session['recipient'] = recipient
@@ -233,16 +239,16 @@ def enterance():
     accepted = requests.find({'$or' : [{'request' : session['user'], 'receive2' : 'True'}, {'receive' : session['user'], 'receive2' : 'True'}]})
     return render_template('enterance.html', user = session['user'], requests = req, accepted = accepted)
 
+#route for chatroom
 @myapp_obj.route('/room', methods = ['GET', 'POST'])
 def room():
     list = chat_history.find({'$or': [{'recipient' : session['recipient'], 'sender':session['user']},{'recipient' : session['user'], 'sender' : session['recipient']}]})
     if request.method == 'GET':
         return render_template('room.html', chats = list)
-
+    #User exiting from a chatroom
     if request.method == 'POST':
         if 'exit' in request.form:
             session.pop('recipient')
-            session.pop('num')
             return redirect(url_for('enterance'))
 
         new_msg = request.form['message']
@@ -283,21 +289,25 @@ def unblock(oid):
         flash("User Unblocked")
         return redirect(url_for('listAccounts'))
     
-
+#Remove a user from the request list when declined, and open a message thread when accepted
 @myapp_obj.route('/request/<oid>', methods = ['GET', 'POST'])
+#The object id provides the unique id tied to each entry of the request database in mongodb
 def acceptOrDecline(oid):
     recipient = requests.find_one({'_id' : ObjectId(oid)}).get('request')
     if request.method == 'POST':
         if 'accept' in request.form:
             query = {'_id' : ObjectId(oid)}
             update = { "$set": { "receive2": 'True' } }
+            #update request status to accepted
             requests.update_one(query, update)
             flash('Accepted chat request from ' + recipient)
         elif 'decline' in request.form:
+            #update request status by deleting the request list
             requests.delete_one({'_id' : ObjectId(oid)})
             flash('Declined chat request from ' + recipient)
         return redirect(url_for('enterance'))
 
+#Enter the chat with selected user
 @myapp_obj.route('/enter/<oid>', methods = ['GET', 'POST'])
 def enterChat(oid):
     if request.method == 'POST':
