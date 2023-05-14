@@ -185,11 +185,13 @@ def afterLogout():
 @myapp_obj.route('/change_password', methods = ['GET', 'POST'])
 def changePassword():
     if request.method == 'POST':
-        if 'back' in request.form:
-            print('hey')
-            return redirect(url_for('logout'))
-        check = users.find_one({'$or': [{'$and' : [{'username' : request.form['username'], 'password':request.form['current_password']}]},{'$and' : [{'email' : request.form['username'], 'password' : request.form['current_password']}]}]})
+        name = request.form['username']
         new = request.form['new_password']
+        curr = request.form['current_password']
+        if 'back' in request.form:
+            return redirect(url_for('logout'))
+        check = users.find_one({'$or': [{'username' : name, 'password':curr},{'email' : name, 'password' : curr}]})
+        
         #Notifying if the user entered wrong username, email, or password
         if check == None:
             return """
@@ -209,9 +211,14 @@ def changePassword():
             """
         #User is granted the permission to change password 
         else:
-            query = {'username' : request.form['username']}
-            update = { "$set": { "password": new } }
-            users.update_one(query, update)
+            if users.find_one({'username' : name}):
+                query = {'username' : request.form['username']}
+                update = { "$set": { "password": new } }
+                users.update_one(query, update)
+            else:
+                query = {'email' : request.form['username']}
+                update = { "$set": { "password": new } }
+                users.update_one(query, update)
             return redirect(url_for('logout'))
 
     return render_template('password_change.html')
