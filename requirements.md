@@ -32,8 +32,7 @@
 
 - **Primary Sequence:**
 
-  1. User enters full name
-  2. User enters birthday
+  1. User enters desired username
   3. User enters valid email address
   4. User enters password
   5. User clicks “Register” button
