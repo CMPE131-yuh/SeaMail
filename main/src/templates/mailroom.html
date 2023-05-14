@@ -30,8 +30,12 @@
 <h1 class="text-warning bold">Email List for {{current_user}}</h1>
 <form method="POST" action="{{url_for('sendEmail')}}">
       <div class="form-outline" style="padding-bottom: 5px;">
-        <input type="text" name="recipe" required class="form-control" placeholder="To:">
+          <input type="text" name="recipe" required class="form-control" placeholder="To:email@seamail.com">
       </div>
+      <!--<button class="dropdown-toggle" type="submit" name="listUserEmails">Emails</button>
+      {% for i in users %}
+        <div class="dropdown-menu">{{i.email}}</div>
+      {% endfor %}-->
       <div class="form-outline" style="padding-bottom: 5px;">
         <input type="text" name="sub" required class="form-control" placeholder="Subject:">
       </div>
@@ -59,7 +63,7 @@
         <tr>
           <td>
             <i class="fa fa-circle text-info m-r-15"></i>
-            {{i.sender}}
+            {{i.user_email}}
           </td>
           <td>
             <a href="#" data-toggle="modal" data-target="#{{i}}"
@@ -103,9 +107,6 @@
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">
                   Close
                 </button>
-                <form method="POST" action="{{url_for('openImage', oid=i._id)}}">
-                  <button type="submit" class="btn btn-secondary">View Image</button>
-                </form>
               </div>
             </div>
           </div>
