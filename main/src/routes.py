@@ -135,8 +135,6 @@ def logout():
             return redirect(url_for('login'))
         elif 'change_password' in request.form:
             return redirect(url_for('changePassword'))
-        elif 'request_list' in request.form:
-            return redirect(url_for('requestlist'))
     return render_template('logout.html', current_user = session['user'])
 
 #login into user account, redirect into user mailroom
@@ -216,10 +214,10 @@ def changePassword():
 def enterance():
     if request.method == 'POST':
         recipient = request.form['recipient']
+        print(recipient)
         num = requests.find({'$or' : [{'request' : session['user'] , 'receive' : recipient}, {'receive' : session['user'], 'request' : recipient}]}).count()
-        print(num)
-        if users.find({'username' : recipient}) == None:
-            flash('The user does not exist!')
+        if users.find_one({'username' : recipient}) == None or recipient == session['user']:
+            flash('Invalid username!')
         elif num == 0:
             requests.insert_one({'request': session['user'], 'receive' : recipient, 'request2' : 'True', 'receive2' : 'False'})
             flash('Request successfully sent to ' + recipient + ' !')
@@ -231,8 +229,9 @@ def enterance():
             list = chat_history.find({'$or': [{'recipient' : recipient, 'sender':session['user']},{'recipient' : session['user'], 'sender' : recipient}]})
             session['recipient'] = recipient
             return redirect(url_for('room'))
-
-    return render_template('enterance.html')
+    req = requests.find({'receive' : session['user'], 'receive2' : 'False'})
+    accepted = requests.find({'$or' : [{'request' : session['user'], 'receive2' : 'True'}, {'receive' : session['user'], 'receive2' : 'True'}]})
+    return render_template('enterance.html', user = session['user'], requests = req, accepted = accepted)
 
 @myapp_obj.route('/room', methods = ['GET', 'POST'])
 def room():
@@ -251,8 +250,6 @@ def room():
         list = chat_history.find({'$or': [{'recipient' : session['recipient'], 'sender':session['user']},{'recipient' : session['user'], 'sender' : session['recipient']}]})
         return render_template('room.html', chats = list)
     
-    
-
     return render_template('room.html', chats = list)
 
 #render user lists
@@ -286,20 +283,27 @@ def unblock(oid):
         flash("User Unblocked")
         return redirect(url_for('listAccounts'))
     
-#Request list for accepting/declinging messages from diff users
-@myapp_obj.route('/requestlist', methods=['GET', 'POST'])
-def requestlist():
-    req = requests.find({'receive' : session['user'], 'receive2' : 'False'})
-    return render_template('requestlist.html', requests = req, user = session['user'])
 
 @myapp_obj.route('/request/<oid>', methods = ['GET', 'POST'])
 def acceptOrDecline(oid):
+    recipient = requests.find_one({'_id' : ObjectId(oid)}).get('request')
     if request.method == 'POST':
         if 'accept' in request.form:
             query = {'_id' : ObjectId(oid)}
             update = { "$set": { "receive2": 'True' } }
             requests.update_one(query, update)
+            flash('Accepted chat request from ' + recipient)
         elif 'decline' in request.form:
             requests.delete_one({'_id' : ObjectId(oid)})
-        req = requests.find({'receive' : session['user'], 'receive2' : 'False'})
-        return redirect(url_for('requestlist', requests = req))
+            flash('Declined chat request from ' + recipient)
+        return redirect(url_for('enterance'))
+
+@myapp_obj.route('/enter/<oid>', methods = ['GET', 'POST'])
+def enterChat(oid):
+    if request.method == 'POST':
+        if requests.find_one({'_id' : ObjectId(oid)}).get('request') != session['user']:
+            session['recipient'] = requests.find_one({'_id' : ObjectId(oid)}).get('request')
+        else:
+            session['recipient'] = requests.find_one({'_id' : ObjectId(oid)}).get('receive')
+        
+    return redirect(url_for('room'))
