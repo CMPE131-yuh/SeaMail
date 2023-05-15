@@ -24,3 +24,7 @@
 10. Notification for new messages, emails(Minh, Marlon)
 11. Users send message request to a designated recipient(Hana)
 12. Delete account(Hana, Anthony)
+
+## Non-functional Requirements
+1. UI interactive interface (or using elements from bootstrap)(Minh, Anthony)
+2. Light Mode and Dark Mode(Minh)
