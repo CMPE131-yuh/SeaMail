@@ -1,8 +1,5 @@
-#import flask for init
-from flask import Flask
+from flask import Flask #import flask for init
 
-#initialize flask application as myapp_obj to be used in other backend pythonn files
-myapp_obj = Flask(__name__)
+myapp_obj = Flask(__name__) #initialize flask application as myapp_obj to be used in other backend pythonn files
 
-#import routes for myapp_obj
-from src import routes
+from src import routes #import routes for myapp_obj
