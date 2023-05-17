@@ -18,20 +18,20 @@ MONGO_URI = 'mongodb+srv://hanasuzuki:8gZpPyV7ZkTb7XOi@test.6mtzohb.mongodb.net/
 socketio = SocketIO(myapp_obj, cors_allowed_origins="*")
 
 #connection to mongoDB client and connecting to each collection in the SeaMail databaase to intialize them as reusable objects
-mongo = MongoClient(MONGO_URI)
-db = mongo.get_database('SeaMail')
-emails = pymongo.collection.Collection(db, 'emails')
-todos = pymongo.collection.Collection(db, 'todolist')
-users = pymongo.collection.Collection(db, 'users')
-chat_history = pymongo.collection.Collection(db, 'chat')
-requests = pymongo.collection.Collection(db, 'request')
-blocked = pymongo.collection.Collection(db, 'blocked')
-blockedEmails = pymongo.collection.Collection(db, 'blockedEmails')
-image = pymongo.collection.Collection(db, 'images')
+mongo = MongoClient(MONGO_URI) #initialize mongo client
+db = mongo.get_database('SeaMail') #set variable db as the connection to the SeaMail mongoDB database
+emails = pymongo.collection.Collection(db, 'emails') #connect to emails collection in the SeaMail database
+todos = pymongo.collection.Collection(db, 'todolist') #connect to todos collection in the SeaMail database
+users = pymongo.collection.Collection(db, 'users') #connect to users collection in the SeaMail database
+chat_history = pymongo.collection.Collection(db, 'chat') #connect to chat_history collection in the SeaMail database
+requests = pymongo.collection.Collection(db, 'request') #connect to requests collection in the SeaMail database
+blocked = pymongo.collection.Collection(db, 'blocked') #connect to blocked collection in the SeaMail database
+blockedEmails = pymongo.collection.Collection(db, 'blockedEmails') #connect to blockedEmails collection in the SeaMail database
+image = pymongo.collection.Collection(db, 'images') #connect to image collection in the SeaMail database
 
 #gridfs for file download
 grid_fs = gridfs.GridFS(db)
 
 #start application on localhost under socketio
 if __name__ == '__main__':
-    socketio.run(myapp_obj, debug = True)
+    socketio.run(myapp_obj, debug = True) #run application with debug set to True for real time refreshing for development
