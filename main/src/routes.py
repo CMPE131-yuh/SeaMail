@@ -11,12 +11,15 @@ from matplotlib.pyplot import imshow, show
 import codecs
 import base64
 
+#import basic python libraries for usage
 import io
 import random
 from string import ascii_uppercase
 
+#import db collection objects from run.py
 from run import emails, todos, users, chat_history, grid_fs, blocked, blockedEmails, image, requests, mongo
 
+#make app object secret key
 myapp_obj.secret_key = "SEAMAIL.HQ"
 
 
