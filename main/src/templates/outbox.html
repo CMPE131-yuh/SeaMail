@@ -1,15 +1,23 @@
-{% extends "base.html" %} {% block title %}TodoList{% endblock %} {% block
-  link%}rel="stylesheet" href="{{ url_for('static',
-  filename='public/mailroom.css') }}"{% endblock%} {% block navbar%}
-  <nav
-    class="navbar navbar-expand-lg navbar-light"
-    style="
-      background-color: rgba(247, 247, 247, 0.15);
-      backdrop-filter: blur(5px);
-    "
-  >
-    <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
-    <button
+<!-- Display list of sent email-->
+{% extends "base.html" %} {% block title %}TodoList{% endblock %}
+
+<!-- extra CSS add in to the page-->
+{% block link%}rel="stylesheet" href="{{ url_for('static',
+filename='public/mailroom.css') }}"{% endblock%}
+
+<!-- Navbar of the page-->
+{% block navbar%}
+<nav
+  class="navbar navbar-expand-lg navbar-light"
+  style="
+    background-color: rgba(247, 247, 247, 0.15);
+    backdrop-filter: blur(5px);
+  "
+>
+  <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
+
+  <!-- Button to expand the collapsed navbar when the window is shrinked-->
+  <button
     class="navbar-toggler"
     type="button"
     data-toggle="collapse"
@@ -21,6 +29,7 @@
     <span class="navbar-toggler-icon"></span>
   </button>
 
+  <!-- Div contains links to other pages-->
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
@@ -28,97 +37,114 @@
       </li>
       <li class="nav-item">
         <a class="nav-link text-warning" href="/todolist"
-        >Todo List<span class="sr-only">(current)</span></a
-      >
-    </li>
-    <li class="nav-item">
-      <a class="nav-link text-warning" href="/outbox">Outbox</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link text-warning" href="/accounts">Other Users</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link btn text-warning" href="/logout">Your Account</a>
-    </li>
-  </ul>
-  <div class="custom-control custom-switch">
-    <input
-      type="checkbox"
-      class="custom-control-input"
-      id="customSwitches"
-      onclick="myFunction()"
-    />
-    <label class="custom-control-label text-warning" for="customSwitches"
-      >Dark Mode</label
-    >
-  </div>
-</div>
-</nav>
-{% endblock %} {% block content%}
-<body>
-  <h1 class="text-warning bold">{{current_user}}'s Outbox</h1>
-  <h3 class="text-warning bold">Sent Emails</h3>
-  <div class="panel panel-default m-t-20 bg-white rounded overflow-hidden">
-    <div class="panel-body">
-      <table class="table table-striped myTable">
-        <tbody>
-          {% for i in sent %}
-          <tr>
-            <td>
-              <i class="fa fa-circle text-info m-r-15"></i>
-              {{i.username}}
-            </td>
-            <td>
-              <a
-                class="anchor"
-                href="#"
-                data-toggle="modal"
-                data-target="#{{i}}"
-                >{{i.subject}}</a
-              >
-            </td>
-            <td>
-              <form
-                method="POST"
-                action="{{url_for('unsendEmail', oid=i._id)}}"
-              >
-                <button class="btn btn-outline-dark my-button">
-                  <i class="fa fa-trash"> Unsend Email</i>
-                </button>
-              </form>
-            </td>
-          </tr>
+          >Todo List<span class="sr-only">(current)</span></a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-warning" href="/outbox">Outbox</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-warning" href="/accounts">Other Users</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link btn text-warning" href="/logout">Your Account</a>
+      </li>
+    </ul>
 
-          <div
-            class="modal fade"
-            id="{{i}}"
-            tabindex="-1"
-            role="dialog"
-            aria-labelledby="exampleModalCenterTitle"
-            aria-hidden="true"
-          >
-            <div class="modal-dialog modal-dialog-centered" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLongTitle">
-                    {{i.subject}}
-                  </h5>
-                  <button
-                    type="button"
-                    class="close"
-                    data-dismiss="modal"
-                    aria-label="Close"
-                  >
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">{{i.message}}</div>
-                <div class="modal-footer">
-                  <button
-                    type="button"
-                    class="btn btn-secondary"
-                    data-dismiss="modal"
-                  >
+    <!-- Button to toggle dark mode, call the myFunction() function in darkmode.js-->
+    <div class="custom-control custom-switch">
+      <input
+        type="checkbox"
+        class="custom-control-input"
+        id="customSwitches"
+        onclick="myFunction()"
+      />
+      <label class="custom-control-label text-warning" for="customSwitches"
+        >Dark Mode</label
+      >
+    </div>
+  </div>
+</nav>
+{% endblock %}
+
+<!-- content of the page-->
+{% block content%}
+<h1 class="text-warning bold">{{current_user}}'s Outbox</h1>
+<h3 class="text-warning bold">Sent Emails</h3>
+
+<!-- Table display available email messages-->
+<div class="panel panel-default m-t-20 bg-white rounded overflow-hidden">
+  <div class="panel-body">
+    <table class="table table-striped myTable">
+      <tbody>
+        <!-- For the object in the 'sent' list -->
+        {% for i in sent %}
+        <tr>
+          <td>
+            <!-- Icon decoration to represent bulletpoints-->
+            <i class="fa fa-circle text-info m-r-15"></i>
+
+            <!-- Display username corresponding to object in 'sent' list-->
+            {{i.username}}
+          </td>
+          <td>
+            <!-- 
+              Display username corresponding to object in 'sent' list
+              It is a link to toggle the modal displaying message
+            -->
+            <a class="anchor" href="#" data-toggle="modal" data-target="#{{i}}"
+              >{{i.subject}}</a
+            >
+          </td>
+          <td>
+            <!-- button to unsend email using POST method to send the request to 'unsendEmail' function-->
+            <form method="POST" action="{{url_for('unsendEmail', oid=i._id)}}">
+              <button class="btn btn-outline-dark my-button">
+                <i class="fa fa-trash"> Unsend Email</i>
+              </button>
+            </form>
+          </td>
+        </tr>
+
+        <!-- 
+          A modal triggered by the link of subject
+          displays the message with respect to the subject
+        -->
+        <div
+          class="modal fade"
+          id="{{i}}"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="exampleModalCenterTitle"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">
+                  {{i.subject}}
+                </h5>
+
+                <!-- Button to close the modal-->
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+
+              <!-- The message-->
+              <div class="modal-body">{{i.message}}</div>
+              <div class="modal-footer">
+                <!-- Button to close the modal-->
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-dismiss="modal"
+                >
                   Close
                 </button>
               </div>
@@ -131,4 +157,3 @@
   </div>
 </div>
 {% endblock %}
-</body>

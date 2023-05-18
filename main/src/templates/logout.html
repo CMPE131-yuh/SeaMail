@@ -1,14 +1,21 @@
-{% extends "base.html" %} {% block title %}TodoList{% endblock %}
-{% block
-  link%}rel="stylesheet" href="{{ url_for('static',
+<!-- Main account page-->
+{% extends "base.html" %} {% block title %}Main Account{% endblock %}
+
+<!-- extra CSS add in to the page-->
+{% block link%}rel="stylesheet" href="{{ url_for('static',
   filename='public/mailroom.css') }}"{% endblock%}
+
+<!-- Navbar of the page-->
 {% block navbar%}
 <nav class="navbar navbar-expand-lg navbar-light" style="background-color: rgba(247, 247, 247, 0.15); backdrop-filter: blur(5px)">
   <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
+
+  <!-- Button to expand the collapsed navbar when the window is shrinked-->
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
 
+  <!-- Div contains links to other pages-->
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
@@ -27,6 +34,8 @@
         <a class="nav-link btn text-warning" href="/logout">Your Account</a>
       </li>
     </ul>
+
+    <!-- Button to toggle dark mode, call the myFunction() function in darkmode.js-->
     <div class="custom-control custom-switch">
       <input
         type="checkbox"
@@ -41,6 +50,8 @@
   </div>
 </nav>
 {% endblock %}
+
+<!-- Content of the page-->
 {% block content %}
 <div class="h-100 d-flex align-items-center justify-content-center">
     <div class="d-flex flex-column">
@@ -56,6 +67,7 @@
         <p>You have <span class="text-warning">{{mails}}</span> emails in your <a href="/mailroom" class="text-light">inbox!</a></p> 
     </br>
     <div>
+      <!-- Buttons to request logout or delete or change password of the account to the 'logout' function through POST method-->
         <form action="{{ url_for('logout') }}" method="POST">
             <button class="btn btn-dark" type = "submit" name = "logout_button" onclick = "alert('Are you sure?')">Log Out</button>
 

@@ -1,6 +1,9 @@
-{% extends "base.html" %} {% block title %}Home{% endblock %} {% block link%}
+<!-- Login page-->
+{% extends "base.html" %} {% block title %}Sign In{% endblock %} {% block link%}
 rel="stylesheet" href="{{ url_for('static', filename='public/log_in.css') }}" {%
 endblock %} {% block content%}
+
+<!-- Sign in form that send the username and password to login function to enter the mailroom through POST method-->
 <form class="Log-in-box" action="{{ url_for('login') }}" method="POST">
   <h3>Sign in</h3>
 
@@ -22,6 +25,7 @@ endblock %} {% block content%}
     required
   />
 
+  <!-- Button to triggered POST method-->
   <button>Login</button>
   <a href="/register">Register</a>
 </form>
