@@ -1,15 +1,19 @@
+<!-- Account page that displays all the users of the system to block or unblock-->
 {% extends "base.html" %} {% block title %}Accounts{% endblock %} {% block
-  link%}rel="stylesheet" href="{{ url_for('static',
-  filename='public/mailroom.css') }}"{% endblock%} {% block navbar%}
-  <nav
-    class="navbar navbar-expand-lg navbar-light"
-    style="
-      background-color: rgba(247, 247, 247, 0.15);
-      backdrop-filter: blur(5px);
-    "
-  >
-    <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
-    <button
+link%}rel="stylesheet" href="{{ url_for('static',
+filename='public/mailroom.css') }}"{% endblock%} {% block navbar%}
+
+<!-- Navbar of the page-->
+<nav
+  class="navbar navbar-expand-lg navbar-light"
+  style="
+    background-color: rgba(247, 247, 247, 0.15);
+    backdrop-filter: blur(5px);
+  "
+>
+  <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
+  <!-- Button to expand the collapsed navbar when the window is shrinked-->
+  <button
     class="navbar-toggler"
     type="button"
     data-toggle="collapse"
@@ -20,7 +24,7 @@
   >
     <span class="navbar-toggler-icon"></span>
   </button>
-
+  <!-- Div contains links to other pages-->
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
@@ -41,6 +45,7 @@
         <a class="nav-link btn text-warning" href="/logout">Your Account</a>
       </li>
     </ul>
+    <!-- Button to toggle dark mode-->
     <div class="custom-control custom-switch">
       <input
         type="checkbox"
@@ -56,22 +61,28 @@
 </nav>
 {% endblock %}
 
+<!-- Content of the page-->
 {% block content %}
 <h1 class="text-warning bold">SeaMail Accounts</h1>
+
+<!-- 
+  Notification function that notify when there are new messages added to get_flashed_messages
+  and display notification
+-->
 {% with messages = get_flashed_messages() %} {% if messages %} {% for message in
-  messages %}
-  <ul
-    style="
-      text-decoration: none;
-      background-color: aliceblue;
-      border-radius: 10px;
-    "
-  >
-    <p style="text-decoration: none">{{ message }}</p>
-  </ul>
-{% endfor %}
-{% endif %}
-{% endwith %}
+messages %}
+<ul
+  style="
+    text-decoration: none;
+    background-color: aliceblue;
+    border-radius: 10px;
+  "
+>
+  <p style="text-decoration: none">{{ message }}</p>
+</ul>
+{% endfor %} {% endif %} {% endwith %}
+
+<!-- Table that displays a list of users-->
 <div class="panel panel-default m-t-20 bg-white rounded overflow-hidden">
   <div class="panel-body">
     <table class="table table-striped myTable">
@@ -89,11 +100,19 @@
             >
           </td>
           <td>
+            <!-- 
+              Button to trigger block function
+              Use POST method to send the request
+            -->
             <form method="POST" action="{{url_for('block', oid=i._id)}}">
               <button type="submit" class="btn btn-outline-dark my-button">
                 <i class="fa fa-trash"> Block User</i>
               </button>
             </form>
+            <!-- 
+              Button to trigger unblock function
+              Use POST method to send the request
+            -->
             <form method="POST" action="{{url_for('unblock', oid=i._id)}}">
               <button type="submit" class="btn btn-outline-dark my-button">
                 <i class="fa fa-trash"> Unblock User</i>

@@ -1,9 +1,8 @@
+<!-- Register account page-->
 {% extends "base.html" %} {% block title %}Register{% endblock %}
-{% block
-    link%} rel="stylesheet" href="{{ url_for('static',
-    filename='public/log_in.css') }}" {% endblock %}
-{% block
-content %} 
+
+<!-- Content of the page-->>
+{% block content %} 
 </br></br>
   <div class="px-0 d-flex flex-column mw-75 justify-content-center align-items-center"
        style="width: 400px; height: auto; margin: 0 auto; border-radius:20px; background-color: rgba(247, 247, 247, 0.39);
@@ -13,15 +12,18 @@ content %}
         <h1 class="word">Register</h1>
     </div>
     <div>
+
+    <!-- Form that send the registered information to the 'register' function through POST method-->
     <form action="{{ url_for('register') }}" method="POST" style="margin: 50px; width: auto; height: 250px; display: flex; flex-direction: column; align-items: center;">
         <div class="msg">{{ msg }}</div>
         <div class = "text-center"><input id="username" name="username" type="text" placeholder="Enter Your Username" class="m-3" required/></div>
         <div class = "text-center"><input id="password" name="password" type="password" placeholder="Enter Your Password" class="m-3" required/></div>
         <div class = "text-center"><input style="width: 300px;" id="email" name="email" type="text" placeholder="[Email]@seamail.com" class="mt-3 mb-3" required/></div>
-        <div class = "text-center" style="padding-bottom: 10px;"><input style="width: 200px; margin-bottom: 10px;" type="submit" class="btn btn-outline-primary" value="Sign Up"></div>
+        <div class = "text-center" style="padding-bottom: 10px;"><input style="width: 200px; margin-bottom: 8px;" type="submit" class="btn btn-outline-primary" value="Sign Up"></div>
     </form>
     </div>
-    <br>
-    <p class="mb-4">Already have an account? <a href="{{url_for('login')}}"> Sign In here</a></p>
+
+    <!-- Return back to the login page-->
+    <p class="mb-3">Already have an account? <a href="{{url_for('login')}}"> Sign In here</a></p>
   </div>
 {% endblock %}

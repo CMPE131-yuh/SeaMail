@@ -1,13 +1,21 @@
-{% extends "base.html" %} {% block title %}TodoList{% endblock %}
-{% block
-  link%}rel="stylesheet" href="{{ url_for('static',
+<!-- Main chat page to start a new chat, accept a request to chat, and enter the accepted chatroom-->
+{% extends "base.html" %} {% block title %}Main Chat Page{% endblock %}
+
+<!-- extra CSS add in to the page-->
+{% block link%}rel="stylesheet" href="{{ url_for('static',
   filename='public/mailroom.css') }}"{% endblock%}
+
+<!-- Navbar of the page-->
 {% block navbar%}
 <nav class="navbar navbar-expand-lg navbar-light" style="background-color: rgba(247, 247, 247, 0.15); backdrop-filter: blur(5px)">
   <a class="navbar-brand text-warning bold h4" href="/mailroom">SeaMail</a>
+  
+  <!-- Button to expand the collapsed navbar when the window is shrinked-->
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
+  
+  <!-- Div contains links to other pages-->
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
@@ -26,6 +34,8 @@
         <a class="nav-link btn text-warning" href="/logout">Your Account</a>
       </li>
     </ul>
+    
+    <!-- Button to toggle dark mode, call the myFunction() function in darkmode.js-->
     <div class="custom-control custom-switch">
       <input
         type="checkbox"
@@ -40,7 +50,10 @@
   </div>
 </nav>
 {% endblock %}
+
+<!-- Content of the page-->
 {% block content %}
+    <!-- Form to start a new chat with someone, sending the username to the database through POST method-->
     <div class="chatting text-center" style="display: block; height: 50px; width: auto; margin: auto;">
         <h2 class="text-warning">Enter the Chat Room</h2>
         <form action="{{ url_for('enterance') }}" method="POST">
@@ -50,6 +63,10 @@
             </div>
         </form>
       </br></br>
+      <!-- 
+         Notification function that notify when there are new messages added to get_flashed_messages
+         and display notification
+      -->
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         {% for message in messages %}
@@ -59,16 +76,26 @@
         {% endfor %}
         {% endif %}
         {% endwith %}
+
+        <!--The message threads and message request lists-->
         <div class="d-flex justify-content-between mx-100">
           <div class="panel panel-default m-t-20 my-div bg-white rounded overflow-hidden col-md-6 mr-2">
+
+            <!-- Message threads-->
             <div class="panel-body">
               <h2 class="text-primary">Your message threads: </h2>
+
+              <!-- Table displays available chat to enter-->
               <table class="table table-striped myTable">
                 <tbody>
+                  <!-- For objects in accepted messages list-->
                   {% for i in accepted %}
                 <tr>
                   <td>
+                    <!-- Icon decoration to represent bulletpoints-->
                     <i class="fa fa-circle text-primary m-r-15"></i>
+
+                    <!-- Return the accepted username that is available in the user database-->
                     {% if i.request == user %}
                       {{i.receive}}
                     {% endif %}
@@ -76,6 +103,11 @@
                       {{i.request}}
                     {% endif %}
                   </td>
+
+                  <!-- 
+                    Button to enter the chat room with the corresponding username,
+                    POST method to send the request to go the corresponding chatroom
+                  -->
                   <td class="d-flex justify-content-start">
                     <form method="POST" action="{{url_for('enterChat', oid = i._id)}}">
                       <button class="btn btn-outline-dark my-button" name="enter">Enter this chat</button>
@@ -87,18 +119,30 @@
               </table>
             </div>
           </div> 
+
+          <!-- Incoming requests to chat with you-->
           <div class="panel panel-default m-t-20 my-div bg-white rounded overflow-hidden col-md-6 ml-1">
             <div class="panel-body">
               <h2 class="text-info">Chat request list for: {{user}}</h2>
               <table class="table table-striped myTable">
                 <tbody>
+
+                  <!-- for username in "requests" list of requested users-->
                   {% for i in requests %}
                   <tr>
                     <td>
+                      <!-- Icon decoration to represent bulletpoints-->
                       <i class="fa fa-circle text-info m-r-15"></i>
+
+                      <!-- Display the username of users in requested list-->
                       {{i.request}}
                     </td>
                     <td>
+
+                      <!-- 
+                        Choices to accept or decline the request to chat
+                        POST method will send the accept or decline action to the "acceptOrDecline" function
+                      -->
                       <form method="POST" action="{{url_for('acceptOrDecline', oid=i._id)}}">
                         <button class="btn btn-outline-dark my-button" name="accept">accept</button>
                         <button class="btn btn-outline-dark my-button" name="decline">decline</button>

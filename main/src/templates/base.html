@@ -1,7 +1,9 @@
+<!-- The base file to connect all the pages of SeaMail -->
 <html>
   <!DOCTYPE html>
   <head>
     <title>{% block title %}{% endblock %}</title>
+    <!-- Applying bootstrap classes to all the pages to all the pages-->
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -16,15 +18,21 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Adding the css for the bubbles animation effect-->
     <link
       rel="stylesheet"
       type="text/css"
       href="{{ url_for('static', filename='public/template_ocean.css') }}"
     />
+    <!-- Extra css for specific pages -->
     <link {% block link %}{% endblock %} />
+
+    <!-- Javascript file for darkmode effect on all pages-->
     <script src="{{ url_for('static', filename='public/darkmode.js') }}"></script>
   </head>
   <body>
+    <!-- Adding the bubbles animation to all pages-->
     <div class="ocean">
       <div class="bubble bubble--1"></div>
       <div class="bubble bubble--2"></div>
@@ -40,9 +48,13 @@
       <div class="bubble bubble--12"></div>
       <div id="octocat"></div>
     </div>
+    <!-- navbar for all the pages-->
     {% block navbar %}{% endblock %}
 
+    <!-- content for each pages-->
     <div class="container">{% block content %} {% endblock %}</div>
+
+    <!-- Using some Jquery and Javascript functions with bootstrap-->
     <script
       src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
       integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
