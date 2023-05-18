@@ -43,7 +43,7 @@ Below are the basic functions that are offered on SeaMail and instructions on ho
 	- Click on the Chat link on the navigation bar, it will redirect you the Chat Main Page
 	- You can send the message to a recipient by typing their username and click "start a new message thread"
 	- Once you send a message to a new person, it will appear on the request list on the right side of the recipient. You can click accept or decline to move it to the message thread
-	- You can start the chat from the message threads on the left side by click enter the chat. It will redirect you to the chat room with that username.
+	- You can start the chat from the message threads on the left side by click enter the chat. It will redirect you to the chat room with that username, from there you can send message or exit the chat.
 6. Todo List
 	- The todo list can be accessed by clicking the Todo List button on the taskbar. From the todo list page, you can add a todo even to your list by filling out the Todo item: box, then clicking the add Todo button. These todos can also be removed by clicking the remove todo button for your todo event.
 7. Block 
