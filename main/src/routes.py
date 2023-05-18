@@ -27,100 +27,85 @@ myapp_obj.secret_key = "SEAMAIL.HQ"
 @myapp_obj.route("/", methods=['GET', 'POST'])
 @myapp_obj.route("/index.html", methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    return render_template('index.html') #render starting index page
 
 #add emails to database
 @myapp_obj.route('/sendMail', methods=['GET', 'POST'])
 def sendEmail():
     if request.method == 'POST':
-        sub = request.form['sub']
-        msg = request.form['msg']
-        rec = request.form['recipe']
-        if blocked.count_documents({'username': rec, 'userBlock': session['user']}) != 0:
-            blockedEmails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False, 'notify': True})
-            flash("This User Has Blocked You")
+        sub = request.form['sub'] #grab subject line for email from frontend
+        msg = request.form['msg'] #grab message from text area to use for email from frontend
+        rec = request.form['recipe'] #recipient information grabbed from frontend form
+        if blocked.count_documents({'username': rec, 'userBlock': session['user']}) != 0: #if the sender is blocked from the recipient run if block
+            blockedEmails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False, 'notify': True}) #email from blocked user gets sent to blockedEmails database
+            flash("This User Has Blocked You") #alert current user that the recipient blocked them
             return redirect(url_for('listEmails'))
-        elif request.files:
-            image = request.files['image']
-            grid_fs.save_file(image.filename, image)
-            emails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False, 'imager': image.filename, 'hasImg': True})
-            return redirect(url_for('listEmails'))
-        else:
-            emails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False, 'hasImg': False, 'notify': True})
-            return redirect(url_for('listEmails'))
+        else: #if user not blocked, run code block
+            emails.insert_one({'username': rec, 'sender': session['user'], 'subject': sub, 'message': msg, 'delete': False, 'hasImg': False, 'notify': True}) #insert new email into collection for recipient's mailroom
+            return redirect(url_for('listEmails')) #render mailroom
     else:
-        return render_template('mailroom.html', message='message not sent', current_user = session['user'])
-
-#open image that was sent from email
-@myapp_obj.route('/openImage/<oid>', methods=['GET', 'POST'])
-def openImage(oid):
-    if request.method == 'POST':
-        images = image.find_one({'_id': ObjectId(oid)})
-        if images:
-            dataurl = images['image']
-            image_base64 = base64.b64encode(dataurl).decode('utf-8')
-            return render_template('viewImage.html', image_data = image_base64)
+        return render_template('mailroom.html', message='message not sent', current_user = session['user']) #error handling in case message doesn't go through, will render webpage with error message
 
 #list emails from database
 @myapp_obj.route('/mailroom', methods=['GET', 'POST'])
 def listEmails():
     if request.method == 'GET':
-        maillist = emails.find({'username': session['user']})
-        if(emails.count_documents({'username': session['user'], 'notify': True}) != 0):
-            flash("You Got Mail!")
-            return render_template('mailroom.html', emails=maillist, current_user = session['user'])
-        return render_template('mailroom.html', emails=maillist, current_user = session['user'])
+        maillist = emails.find({'username': session['user']}) #find emails in database that are specific to the current session user
+        if(emails.count_documents({'username': session['user'], 'notify': True}) != 0): #if user has emails, notify in webpage
+            flash("You Got Mail!") #alert message to notify user for emails
+            return render_template('mailroom.html', emails=maillist, current_user = session['user']) #render list of emails
+        return render_template('mailroom.html', emails=maillist, current_user = session['user']) #render list of emails
     else:
-        return render_template('mailroom.html', message='No Emails At This Time', current_user = session['user'])
+        return render_template('mailroom.html', message='No Emails At This Time', current_user = session['user']) #error handling in case no emails or something wrong with listing emails
 
 #list outbox emails from database
 @myapp_obj.route('/outbox', methods=['GET', 'POST'])
 def listOutbox():
-    maillist = emails.find({'delete': False})
-    return render_template('outbox.html', sent=maillist, current_user = session['user'])
+    maillist = emails.find({'delete': False}) #grab sent mail from the database for unsending
+    return render_template('outbox.html', sent=maillist, current_user = session['user']) #render outbox page with mail grabbed from emails collection
 
 #unsend emails for both sender and receiver
 @myapp_obj.route('/unsendEmail/<oid>', methods=['GET', 'POST'])
 def unsendEmail(oid):
     if request.method == 'POST':
-        emails.update_one({'_id': ObjectId(oid)}, {'$set': {'delete': True}})
-        emails.delete_one({'delete': True})
-        return redirect(url_for('listOutbox'))
-    return render_template('outbox.html', sent='Error Loading Outbox')
+        emails.update_one({'_id': ObjectId(oid)}, {'$set': {'delete': True}}) #update email ready for delete by setting delete value to True, grabs email from ObjectID
+        emails.delete_one({'delete': True}) #delete emails that have delete value set to True
+        return redirect(url_for('listOutbox')) #render listoutbox to render outbox page again after email gets unsent
+    return render_template('outbox.html', sent='Error Loading Outbox') #error handling to render error message
 
 #delete email for the current user's mailroom
 @myapp_obj.route('/delEmail/<oid>', methods=['GET', 'POST'])
 def delEmail(oid):
     if request.method == 'POST':
-        emails.update_one({'_id': ObjectId(oid)}, {'$set': {'delete': True}})
-        emails.delete_one({'delete': True})
-        return redirect(url_for('listEmails'))
-    return render_template('mailroom.html', emails='Error Loading Mailroom')
+        emails.update_one({'_id': ObjectId(oid)}, {'$set': {'delete': True}}) #after grabbing objectid, update delete item to True to mark item for delete
+        emails.delete_one({'delete': True}) #delete the newly set True value
+        return redirect(url_for('listEmails')) #redirect to mailroom to list newly updated list of emails
+    return render_template('mailroom.html', emails='Error Loading Mailroom') #error handling, render error message if error
 
 #render todolist
 @myapp_obj.route('/todolist', methods=['GET', 'POST'])
 def todo():
-    todolist = todos.find({'username': session['user']})
-    return render_template('todo.html', todos=todolist, username=session['user'])
+    todolist = todos.find({'username': session['user']}) #grab todos from todos collection based on current session user
+    return render_template('todo.html', todos=todolist, username=session['user']) #render todolist page with specific todos grabbed from previous line
 
 #add item to todo list database
 @myapp_obj.route('/addtodo', methods=['GET', 'POST'])
 def addTodo():
     if request.method == 'POST':
-        todoitem = request.form['todoitem']
-        todos.insert_one({'username': session['user'], 'item': todoitem, 'delete': False})
-        getTodoItem = todos.find({'username': session['user']})
-        return redirect(url_for('todo'))
-    return render_template('todo.html', todos='Todo Not Rendered')
+        todoitem = request.form['todoitem'] #get form submission into todoitem
+        todos.insert_one({'username': session['user'], 'item': todoitem, 'delete': False}) #insert new todoitem grabbed from form submission
+        getTodoItem = todos.find({'username': session['user']}) #grab todoitems again from todos collection
+        return redirect(url_for('todo')) #redirect to todo to render todolist page
+    return render_template('todo.html', todos='Todo Not Rendered') #error handling in case above code block not rendered
 
 #remove item from todo list database collection
 @myapp_obj.route('/removetodo/<oid>', methods=['GET', 'POST'])
 def remTodo(oid):
     if request.method == 'POST':
-        todos.update_one({'_id': ObjectId(oid)}, {'$set': {'delete': True}})
-        todos.delete_one({'delete': True})
-        return redirect(url_for('todo'))
-    return render_template('todo.html', todos='Todo Not Rendered')
+        todos.update_one({'_id': ObjectId(oid)}, {'$set': {'delete': True}}) #update item based on grabbed object id to be marked for deletion
+        todos.delete_one({'delete': True}) #delete item that has been marked for deletion
+        return redirect(url_for('todo')) #redirect to todolist to be rendered
+    return render_template('todo.html', todos='Todo Not Rendered') #error handling, renders error message
 
 #logout funcionality, logs out current user session
 @myapp_obj.route('/logout', methods = ['GET', 'POST'])
@@ -282,27 +267,27 @@ def listAccounts():
 @myapp_obj.route('/block/<oid>', methods = ['GET', 'POST'])
 def block(oid):
     if request.method == 'POST':
-        userBlocked = users.find_one({'_id': ObjectId(oid)})
+        userBlocked = users.find_one({'_id': ObjectId(oid)}) #find user by object id
         if userBlocked:
-            nameBlocked = userBlocked['username']
-            blocked.insert_one({'username': session['user'], 'userBlock': nameBlocked})
-            flash("User Blocked")
-            return redirect(url_for('listAccounts'))
+            nameBlocked = userBlocked['username'] #get the username of that user after finding object id
+            blocked.insert_one({'username': session['user'], 'userBlock': nameBlocked}) #insert blocked username into blocked collection
+            flash("User Blocked") #notify user that the person they blocked has been blocked
+            return redirect(url_for('listAccounts')) #redirect to list of accounts
     
 #remove user from current user's blocked user emails
 @myapp_obj.route('/unblock/<oid>', methods = ['GET', 'POST'])
 def unblock(oid):
     if request.method == 'POST':
-        userBlocked = users.find_one({'_id': ObjectId(oid)})
+        userBlocked = users.find_one({'_id': ObjectId(oid)}) #find user by object id
         if userBlocked:
-            nameUnblocked = userBlocked['username']
+            nameUnblocked = userBlocked['username'] #get the username of that user after finding object id
             blocked.delete_one({'_id': ObjectId(oid)})
-            if blockedEmails.count_documents({'sender': nameUnblocked}) != 0:
-                blockedEmail = blockedEmails.find_one({'sender': nameUnblocked})
-                emails.insert_one(blockedEmail)
-        blocked.delete_one({'username': session['user'], 'userBlock': nameUnblocked})
-        flash("User Unblocked")
-        return redirect(url_for('listAccounts'))
+            if blockedEmails.count_documents({'sender': nameUnblocked}) != 0: #check to seee if the user being unblocked has emails that were sent to blockedEmails collection
+                blockedEmail = blockedEmails.find_one({'sender': nameUnblocked}) #find blockedEmails based on the username that was blocked
+                emails.insert_one(blockedEmail) #insert those blocked emails into the emails collection so it can be listed in the mailroom
+        blocked.delete_one({'username': session['user'], 'userBlock': nameUnblocked}) #delete blocked username from the blocked collection
+        flash("User Unblocked") #notify current user that the user they unblocked has been unblocked
+        return redirect(url_for('listAccounts')) #redirect to list accounts page
     
 #Remove a user from the request list when declined, and open a message thread when accepted
 @myapp_obj.route('/request/<oid>', methods = ['GET', 'POST'])
