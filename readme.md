@@ -39,16 +39,24 @@ Below are the basic functions that are offered on SeaMail and instructions on ho
 	- After succesfully logging in or by clicking the Seamail button on the taskbar, you will be sent to the mailroom page, where you can email another registered user by filling out the username, subject, and message boxes, then clicking the send email button.
 4. View Mail
 	- From the mailroom page, you can view emails that have been sent to you under the send mail boxes.
-5. Todo List
+5. Chat
+	- Click on the Chat link on the navigation bar, it will redirect you the Chat Main Page
+	- You can send the message to a recipient by typing their username and click "start a new message thread"
+	- Once you send a message to a new person, it will appear on the request list on the right side of the recipient. You can click accept or decline to move it to the message thread
+	- You can start the chat from the message threads on the left side by click enter the chat. It will redirect you to the chat room with that username.
+6. Todo List
 	- The todo list can be accessed by clicking the Todo List button on the taskbar. From the todo list page, you can add a todo even to your list by filling out the Todo item: box, then clicking the add Todo button. These todos can also be removed by clicking the remove todo button for your todo event.
-6. Block 
+7. Block 
 	- To block a user from sending you messages, you can a access a list of other registered users in the other users button on the task bar, from there you will be able to view a list of all other registered users where you can block/unblock by clicking the block or unblock button next to each user's name.
-7. Log Out
+8. Log Out
 	- Click on the your account button on the taskbar, then click the log out button
-8. Delete Account
+9. Delete Account
 	- Click on the your account button on the taskbar, then click the delete account button
-9. Night Mode 
+10. Night Mode 
 	- A night mode function can be toggled on and off by clicking the dark mode switch on the top right corner of the taskbar. 
+11. Change password
+	- Go to Your account on the navigation bar, click on change password. It will redirect you to the change password page
+	- Type in your username, password, new password, then click change. It will redirect you back to the account page, and your password has sucessfully changed.
 
 # Test Account
 - A test account is avaivable to use to view the basic functions of the website
